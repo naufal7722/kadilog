@@ -23,7 +23,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <x-stat-card title="Order Perlu Diproses" value="28" icon="order" color="warning" />
-        <x-stat-card title="Total Konsumen" value="1,240" icon="konsumen" color="primary" trend="up" trendValue="12" />
+        <x-stat-card title="Total Konsumen" value="1,240" icon="konsumen" color="primary" trend="up" />
         <x-stat-card title="Rute Aktif" value="45" icon="rute" color="info" />
         <x-stat-card title="Operator Tersedia" value="8" icon="operator" color="success" />
     </div>
