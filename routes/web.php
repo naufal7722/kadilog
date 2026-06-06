@@ -1,0 +1,117 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+/*
+|--------------------------------------------------------------------------
+| KasaLog - Frontend Routes (UI/UX Only)
+|--------------------------------------------------------------------------
+| Semua route mengembalikan view langsung tanpa controller.
+| Parameter ?role= digunakan untuk demo switching role.
+|--------------------------------------------------------------------------
+*/
+
+// Redirect root ke login
+Route::get('/', fn() => redirect('/login'));
+
+// Auth
+Route::get('/login', fn() => view('auth.login'));
+
+// Dashboard per role
+Route::get('/dashboard/{role?}', function (string $role = 'staff') {
+    $validRoles = ['superadmin', 'staff', 'supplier', 'operator'];
+    $role = in_array($role, $validRoles) ? $role : 'staff';
+    return view("dashboard.{$role}", [
+        'role' => $role,
+        'pageTitle' => 'Dashboard',
+    ]);
+});
+
+// Kelola Supplier
+Route::get('/suppliers', function (Request $request) {
+    return view('suppliers.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Supplier',
+    ]);
+});
+
+// Kelola Konsumen
+Route::get('/konsumen', function (Request $request) {
+    return view('konsumen.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Konsumen',
+    ]);
+});
+
+// Kelola Operator
+Route::get('/operators', function (Request $request) {
+    return view('operators.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Operator',
+    ]);
+});
+
+// Kelola Pelabuhan
+Route::get('/pelabuhan', function (Request $request) {
+    return view('pelabuhan.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Pelabuhan',
+    ]);
+});
+
+// Kelola Rute
+Route::get('/rute', function (Request $request) {
+    return view('rute.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Rute',
+    ]);
+});
+
+// Order
+Route::get('/orders', function (Request $request) {
+    return view('orders.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Order',
+    ]);
+});
+
+Route::get('/orders/{id}', function (Request $request, string $id) {
+    return view('orders.show', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Detail Order',
+        'orderId' => $id,
+    ]);
+});
+
+// Tracking Delivery
+Route::get('/tracking', function (Request $request) {
+    return view('tracking.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Tracking Delivery',
+    ]);
+});
+
+Route::get('/tracking/{id}', function (Request $request, string $id) {
+    return view('tracking.show', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Detail Tracking',
+        'trackingId' => $id,
+    ]);
+});
+
+// Manajemen Status Delivery (Superadmin)
+Route::get('/status-delivery', function (Request $request) {
+    return view('status-delivery.index', [
+        'role' => 'superadmin',
+        'pageTitle' => 'Manajemen Status Delivery',
+    ]);
+});
+
+// Profil
+Route::get('/profile', function (Request $request) {
+    return view('profile.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Profil Saya',
+    ]);
+});
