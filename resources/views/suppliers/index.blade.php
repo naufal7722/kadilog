@@ -53,33 +53,24 @@
             <table id="table-supplier" class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-secondary-50 text-secondary-500 text-xs uppercase tracking-wider">
-                        <th class="px-6 py-3 font-medium">Nama Supplier</th>
-                        <th class="px-6 py-3 font-medium">Kontak</th>
-                        <th class="px-6 py-3 font-medium">Pulau Asal</th>
-                        <th class="px-6 py-3 font-medium">Status</th>
+                        <th class="px-6 py-3 font-medium">Kode Supplier</th>
+                        <th class="px-6 py-3 font-medium">Nama UMKM</th>
+                        <th class="px-6 py-3 font-medium">Nama PIC</th>
+                        <th class="px-6 py-3 font-medium">Kontak PIC</th>
                         <th class="px-6 py-3 font-medium text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-secondary-100">
-                    {{-- Row 1 --}}
                     <tr class="table-row-hover">
-                        <td class="px-6 py-4">
-                            <p class="font-medium text-secondary-900">PT. Maju Sejahtera</p>
-                            <p class="text-xs text-secondary-500 mt-0.5">SUP-001</p>
-                        </td>
-                        <td class="px-6 py-4">
-                            <p class="text-sm text-secondary-700">budi@majusejahtera.com</p>
-                            <p class="text-xs text-secondary-500 mt-0.5">0812-3456-7890</p>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-secondary-700">Batam</td>
-                        <td class="px-6 py-4">
-                            <x-badge-status status="Aktif" />
-                        </td>
+                        <td class="px-6 py-4 font-mono text-sm text-secondary-600">SUP-001</td>
+                        <td class="px-6 py-4 font-medium text-secondary-900">PT. Maju Sejahtera</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">Bpk. Budi</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">0812-3456-7890</td>
                         <td class="px-6 py-4 text-right space-x-1">
                             <button onclick="openModal('modal-detail')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-info-600 hover:bg-info-50 rounded-lg transition-colors" data-tooltip="Detail">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
-                            <button onclick="handleEdit('PT. Maju Sejahtera', 'budi@majusejahtera.com', '0812-3456-7890', 'Batam', 'Batam Center', '1')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Edit">
+                            <button onclick="handleEdit('SUP-001', 'PT. Maju Sejahtera', 'Batam Center, Ruko Greenland Blok B No. 12', 'Bpk. Budi', '0812-3456-7890')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             </button>
                             <button onclick="confirmDelete('PT. Maju Sejahtera')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors" data-tooltip="Hapus">
@@ -87,25 +78,16 @@
                             </button>
                         </td>
                     </tr>
-                    {{-- Row 2 --}}
                     <tr class="table-row-hover">
-                        <td class="px-6 py-4">
-                            <p class="font-medium text-secondary-900">CV. Bahari Karya</p>
-                            <p class="text-xs text-secondary-500 mt-0.5">SUP-002</p>
-                        </td>
-                        <td class="px-6 py-4">
-                            <p class="text-sm text-secondary-700">admin@baharikarya.id</p>
-                            <p class="text-xs text-secondary-500 mt-0.5">0852-1122-3344</p>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-secondary-700">Bintan</td>
-                        <td class="px-6 py-4">
-                            <x-badge-status status="Aktif" />
-                        </td>
+                        <td class="px-6 py-4 font-mono text-sm text-secondary-600">SUP-002</td>
+                        <td class="px-6 py-4 font-medium text-secondary-900">CV. Bahari Karya</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">Ibu Sari</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">0852-1122-3344</td>
                         <td class="px-6 py-4 text-right space-x-1">
                             <button onclick="openModal('modal-detail')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-info-600 hover:bg-info-50 rounded-lg transition-colors" data-tooltip="Detail">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
-                            <button onclick="handleEdit('CV. Bahari Karya', 'admin@baharikarya.id', '0852-1122-3344', 'Bintan', 'Tanjung Uban', '1')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Edit">
+                            <button onclick="handleEdit('SUP-002', 'CV. Bahari Karya', 'Tanjung Uban', 'Ibu Sari', '0852-1122-3344')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             </button>
                             <button onclick="confirmDelete('CV. Bahari Karya')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors" data-tooltip="Hapus">
@@ -132,18 +114,14 @@
 <x-modal id="modal-form" title="Form Supplier" maxWidth="max-w-2xl">
     <form class="space-y-6" data-demo-form>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2">
-                <x-form-input name="nama" label="Nama Perusahaan/Supplier" required />
-            </div>
-            <x-form-input type="email" name="email" label="Email" required />
-            <x-form-input type="text" name="telepon" label="No. Telepon/WA" required />
+            <x-form-input name="kode_supplier" label="Kode Supplier" placeholder="Misal: SUP-001" required />
+            <x-form-input name="nama_umkm" label="Nama UMKM/Supplier" required />
+            <x-form-input name="nama_pic" label="Nama PIC" required />
+            <x-form-input name="no_hp_pic" label="No. HP PIC" required />
             
             <div class="md:col-span-2">
                 <x-form-input type="textarea" name="alamat" label="Alamat Lengkap" rows="2" required />
             </div>
-
-            <x-form-input type="select" name="pulau" label="Pulau Asal" :options="['Batam' => 'Batam', 'Bintan' => 'Bintan', 'Karimun' => 'Karimun']" required />
-            <x-form-input type="select" name="status" label="Status" :options="['1' => 'Aktif', '0' => 'Nonaktif']" />
         </div>
 
         <div class="flex justify-end gap-3 pt-6 border-t border-secondary-100">
@@ -175,23 +153,19 @@
 
         <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
             <div>
-                <p class="text-secondary-500 mb-1">Email</p>
-                <p class="font-medium text-secondary-900">budi@majusejahtera.com</p>
+                <p class="text-secondary-500 mb-1">Nama PIC</p>
+                <p class="font-medium text-secondary-900">Bpk. Budi</p>
             </div>
             <div>
-                <p class="text-secondary-500 mb-1">No. Telepon</p>
+                <p class="text-secondary-500 mb-1">No. HP PIC</p>
                 <p class="font-medium text-secondary-900">0812-3456-7890</p>
             </div>
             <div class="col-span-2">
-                <p class="text-secondary-500 mb-1">Alamat</p>
+                <p class="text-secondary-500 mb-1">Alamat Lengkap</p>
                 <p class="font-medium text-secondary-900">Batam Center, Ruko Greenland Blok B No. 12</p>
             </div>
             <div>
-                <p class="text-secondary-500 mb-1">Pulau Asal</p>
-                <p class="font-medium text-secondary-900">Batam</p>
-            </div>
-            <div>
-                <p class="text-secondary-500 mb-1">Tanggal Bergabung</p>
+                <p class="text-secondary-500 mb-1">Tanggal Terdaftar</p>
                 <p class="font-medium text-secondary-900">12 Jan 2024</p>
             </div>
         </div>
@@ -204,7 +178,7 @@
 
 @section('scripts')
 <script>
-    function handleEdit(nama, email, telepon, pulau, alamat, status) {
+    function handleEdit(kode_supplier, nama_umkm, alamat, nama_pic, no_hp_pic) {
         // Reset form
         document.querySelector('#modal-form form').reset();
         
@@ -213,12 +187,11 @@
         
         // Memasukkan data ke form
         populateEditModal('modal-form', {
-            nama: nama,
-            email: email,
-            telepon: telepon,
+            kode_supplier: kode_supplier,
+            nama_umkm: nama_umkm,
             alamat: alamat,
-            pulau: pulau,
-            status: status
+            nama_pic: nama_pic,
+            no_hp_pic: no_hp_pic
         });
     }
 </script>

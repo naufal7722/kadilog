@@ -31,6 +31,7 @@ $menuItems = [
     ],
     'operator' => [
         ['label' => 'Dashboard', 'href' => '/dashboard/operator', 'icon' => 'dashboard', 'match' => 'dashboard'],
+        ['label' => 'Order Saya', 'href' => '/orders?role=operator', 'icon' => 'order', 'match' => 'orders'],
         ['label' => 'Rute Saya', 'href' => '/rute?role=operator', 'icon' => 'rute', 'match' => 'rute'],
         ['label' => 'Update Status', 'href' => '/tracking?role=operator', 'icon' => 'tracking', 'match' => 'tracking'],
     ],

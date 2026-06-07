@@ -22,7 +22,7 @@
             </p>
         </div>
         
-        @if(request('role') == 'operator')
+        @if(in_array(request('role', 'staff'), ['operator', 'superadmin']))
         <button onclick="openModal('modal-update-status')" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2 h-fit">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Update Status
@@ -138,6 +138,7 @@
     </div>
 </div>
 
+@if(in_array(request('role', 'staff'), ['operator', 'superadmin']))
 {{-- Modal Update Status (Khusus Operator) --}}
 <x-modal id="modal-update-status" title="Update Status Pengiriman" maxWidth="max-w-md">
     <form class="space-y-5" data-demo-form>
@@ -153,4 +154,5 @@
         </div>
     </form>
 </x-modal>
+@endif
 @endsection
