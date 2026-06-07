@@ -72,7 +72,7 @@
                             <x-badge-status status="Proses Pengiriman Laut" />
                         </td>
                         <td class="px-6 py-4 text-right space-x-1 flex justify-end items-center">
-                            @if(request('role') == 'staff')
+                            @if(request('role') == 'superadmin')
                             <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-50 border border-success-200 rounded-lg text-sm font-medium text-success-700 hover:bg-success-100 hover:text-success-800 transition-colors shadow-sm mr-2" onclick="alert('Order ACC berhasil di-klik!')">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 ACC Order

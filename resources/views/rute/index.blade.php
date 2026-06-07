@@ -13,10 +13,12 @@
             <h2 class="text-2xl font-bold text-secondary-900">Jaringan Rute Laut</h2>
             <p class="text-secondary-500 mt-1">Pemetaan visual dan pendataan rute pelayaran antar pelabuhan.</p>
         </div>
+        @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
         <button onclick="openModal('modal-form')" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2 shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Buat Rute Baru
         </button>
+        @endif
     </div>
 
     {{-- Map Visualization Area --}}
@@ -78,7 +80,9 @@
                         <th class="px-6 py-3 font-medium">Kode Rute</th>
                         <th class="px-6 py-3 font-medium">Pelabuhan (Asal → Tujuan)</th>
                         <th class="px-6 py-3 font-medium">Jarak Tempuh</th>
+                        @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
                         <th class="px-6 py-3 font-medium text-right">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-secondary-100">
@@ -93,10 +97,12 @@
                             <p class="text-xs text-secondary-500">Batam → Natuna</p>
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary-700">300 Nautical Miles</td>
+                        @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
                         <td class="px-6 py-4 text-right space-x-1">
                             <button onclick="handleEdit('RT-001', 'P-BTM1', 'P-NTN1', '300 Nautical Miles')" class="text-primary-600 hover:text-primary-800 text-sm font-medium mr-3">Edit</button>
                             <button class="text-danger-600 hover:text-danger-800 text-sm font-medium">Hapus</button>
                         </td>
+                        @endif
                     </tr>
                     <tr class="table-row-hover">
                         <td class="px-6 py-4 font-mono text-sm text-secondary-600">RT-002</td>
@@ -109,10 +115,12 @@
                             <p class="text-xs text-secondary-500">Batam → Bintan</p>
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary-700">45 Nautical Miles</td>
+                        @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
                         <td class="px-6 py-4 text-right space-x-1">
                             <button onclick="handleEdit('RT-002', 'P-BTM1', 'P-BTN1', '45 Nautical Miles')" class="text-primary-600 hover:text-primary-800 text-sm font-medium mr-3">Edit</button>
                             <button class="text-danger-600 hover:text-danger-800 text-sm font-medium">Hapus</button>
                         </td>
+                        @endif
                     </tr>
                 </tbody>
             </table>
@@ -120,6 +128,7 @@
     </div>
 </div>
 
+@if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
 <x-modal id="modal-form" title="Form Rute" maxWidth="max-w-md">
     <form class="space-y-5" data-demo-form>
         <x-form-input name="kode_rute" label="Kode Rute" placeholder="Misal: RT-001" required />
@@ -144,6 +153,7 @@
         </div>
     </form>
 </x-modal>
+@endif
 
 <script>
     function handleEdit(kode_rute, kode_pelabuhan_asal, kode_pelabuhan_tujuan, jarak) {
