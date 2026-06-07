@@ -40,7 +40,10 @@ $notifications = [
         <div class="flex items-center gap-2">
             {{-- Role Switcher (Demo) --}}
             <div class="relative hidden sm:block">
-               
+                <button data-dropdown-toggle="role-switcher" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors border border-primary-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
+                    <span>Demo: {{ $roleLabels[$role] ?? 'Staff' }}</span>
+                </button>
                 <div id="role-switcher" class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-secondary-200 py-1 z-50">
                     <p class="px-3 py-2 text-[10px] uppercase tracking-wider text-secondary-400 font-semibold">Ganti Role</p>
                     @foreach (['superadmin' => 'Super Admin', 'staff' => 'Staff', 'supplier' => 'Supplier', 'operator' => 'Operator'] as $r => $label)
