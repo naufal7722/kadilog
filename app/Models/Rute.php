@@ -10,4 +10,9 @@ class Rute extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = ['kode_rute', 'kode_pelabuhan', 'jarak'];
+
+    public function pelabuhan()
+    {
+        return $this->belongsTo(Pelabuhan::class, 'kode_pelabuhan', 'kode_pelabuhan');
+    }
 }

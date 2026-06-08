@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'role', 'kode_konsumen', 'kode_operator', 'kode_supplier'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,5 +28,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function konsumen()
+    {
+        return $this->belongsTo(Konsumen::class, 'kode_konsumen', 'kode_konsumen');
+    }
+
+    public function operator()
+    {
+        return $this->belongsTo(Operator::class, 'kode_operator', 'kode_operator');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'kode_supplier', 'kode_supplier');
     }
 }

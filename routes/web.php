@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SupplierDashboardController;
+use App\Http\Controllers\OperatorDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,9 +19,16 @@ use Illuminate\Http\Request;
 Route::get('/', fn() => redirect('/login'));
 
 // Auth
-Route::get('/login', fn() => view('auth.login'));
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get ('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 // Dashboard per role
+Route::get('/dashboard/supplier', [SupplierDashboardController::class, 'index'])->middleware('auth');
+Route::get('/dashboard/operator', [OperatorDashboardController::class, 'index'])->middleware('auth');
+
 Route::get('/dashboard/{role?}', function (string $role = 'staff') {
     $validRoles = ['superadmin', 'staff', 'supplier', 'operator'];
     $role = in_array($role, $validRoles) ? $role : 'staff';

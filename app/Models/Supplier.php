@@ -10,4 +10,14 @@ class Supplier extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = ['kode_supplier', 'nama_umkm', 'alamat', 'nama_pic', 'no_hp_pic'];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'kode_supplier', 'kode_supplier');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'kode_supplier', 'kode_supplier');
+    }
 }

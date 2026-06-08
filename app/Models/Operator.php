@@ -10,4 +10,9 @@ class Operator extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = ['kode_operator', 'nama_operator', 'no_hp'];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'kode_operator', 'kode_operator');
+    }
 }

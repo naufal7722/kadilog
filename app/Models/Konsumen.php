@@ -10,4 +10,9 @@ class Konsumen extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = ['kode_konsumen', 'nama_konsumen', 'nama_pic_konsumen'];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'kode_konsumen', 'kode_konsumen');
+    }
 }
