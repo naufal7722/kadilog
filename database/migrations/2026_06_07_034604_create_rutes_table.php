@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rutes', function (Blueprint $table) {
-            $table->string('kode_rute')->primary();
-            $table->string('kode_pelabuhan');
+            $table->id('kode_rute');
+            $table->unsignedBigInteger('kode_pelabuhan');
             $table->foreign('kode_pelabuhan')->references('kode_pelabuhan')->on('pelabuhans')->onDelete('cascade');
             $table->decimal('jarak', 10, 2)->default(0);
             $table->timestamps();

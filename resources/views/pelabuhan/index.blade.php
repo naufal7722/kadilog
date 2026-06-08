@@ -60,10 +60,7 @@
 
 <x-modal id="modal-form" title="Form Pelabuhan" maxWidth="max-w-lg">
     <form class="space-y-5" data-demo-form>
-        <div class="grid grid-cols-2 gap-4">
-            <x-form-input name="kode_pelabuhan" label="Kode Pelabuhan" placeholder="Misal: P-BTM1" required />
-            <x-form-input name="nama_pulau" label="Nama Pulau" placeholder="Misal: Batam" required />
-        </div>
+        <x-form-input name="nama_pulau" label="Nama Pulau" placeholder="Misal: Batam" required />
         <x-form-input name="nama_pelabuhan" label="Nama Pelabuhan" required />
         <x-form-input name="nama_gudang" label="Nama Gudang (Terhubung)" required />
         <x-form-input name="koordinat" label="Koordinat (Latitude, Longitude)" placeholder="-0.1234, 104.5678" required />
@@ -79,7 +76,7 @@
     function handleEdit(kode_pelabuhan, nama_pelabuhan, nama_pulau, nama_gudang, koordinat) {
         document.querySelector('#modal-form h3').textContent = 'Edit Pelabuhan';
         populateEditModal('modal-form', { 
-            kode_pelabuhan, nama_pelabuhan, nama_pulau, nama_gudang, koordinat 
+            nama_pelabuhan, nama_pulau, nama_gudang, koordinat 
         });
     }
 </script>

@@ -63,7 +63,6 @@
 
 <x-modal id="modal-form" title="Form Status Delivery" maxWidth="max-w-md">
     <form class="space-y-5" data-demo-form>
-        <x-form-input name="kode_status_delivery" label="Kode Status" placeholder="Misal: ST-01" required />
         <x-form-input name="nama_status_delivery" label="Nama Status Delivery" placeholder="Misal: Tiba di Pelabuhan Tujuan" required />
         <x-form-input type="textarea" name="deskripsi" label="Deskripsi" placeholder="Keterangan lengkap mengenai status ini" rows="3" required />
 
@@ -77,7 +76,7 @@
 <script>
     function handleEdit(kode_status_delivery, nama_status_delivery, deskripsi) {
         document.querySelector('#modal-form h3').textContent = 'Edit Status Delivery';
-        populateEditModal('modal-form', { kode_status_delivery, nama_status_delivery, deskripsi });
+        populateEditModal('modal-form', { nama_status_delivery, deskripsi });
     }
 </script>
 @endsection

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->string('kode_order')->primary();
-            $table->string('kode_supplier');
+            $table->id('kode_order');
+            $table->unsignedBigInteger('kode_supplier');
             $table->foreign('kode_supplier')->references('kode_supplier')->on('suppliers')->onDelete('cascade');
             $table->string('isi_produk');
             $table->decimal('berat', 10, 2);
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->boolean('es')->default(false);
             $table->date('pengiriman_awal')->nullable();
             $table->date('pengiriman_tujuan')->nullable();
-            $table->string('kode_konsumen');
+            $table->unsignedBigInteger('kode_konsumen');
             $table->foreign('kode_konsumen')->references('kode_konsumen')->on('konsumens')->onDelete('cascade');
             $table->timestamps();
         });

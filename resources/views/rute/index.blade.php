@@ -131,8 +131,6 @@
 @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
 <x-modal id="modal-form" title="Form Rute" maxWidth="max-w-md">
     <form class="space-y-5" data-demo-form>
-        <x-form-input name="kode_rute" label="Kode Rute" placeholder="Misal: RT-001" required />
-        
         <div class="p-4 bg-primary-50 border border-primary-100 rounded-xl space-y-4">
             <h4 class="text-xs font-bold uppercase tracking-wider text-primary-800">Koneksi Pelabuhan</h4>
             {{-- Menggunakan dropdown dummy untuk mengilustrasikan relasi kode_pelabuhan asal & tujuan --}}
@@ -158,7 +156,7 @@
 <script>
     function handleEdit(kode_rute, kode_pelabuhan_asal, kode_pelabuhan_tujuan, jarak) {
         document.querySelector('#modal-form h3').textContent = 'Edit Rute';
-        populateEditModal('modal-form', { kode_rute, kode_pelabuhan_asal, kode_pelabuhan_tujuan, jarak });
+        populateEditModal('modal-form', { kode_pelabuhan_asal, kode_pelabuhan_tujuan, jarak });
     }
 </script>
 @endsection
