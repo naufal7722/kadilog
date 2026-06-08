@@ -15,8 +15,8 @@ use App\Http\Controllers\OperatorDashboardController;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root ke login
-Route::get('/', fn() => redirect('/login'));
+// Landing Page
+Route::get('/', fn() => view('landing.index'));
 
 // Auth
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -119,9 +119,7 @@ Route::get('/status-delivery', function (Request $request) {
 });
 
 // Profil
-Route::get('/profile', function (Request $request) {
-    return view('profile.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Profil Saya',
-    ]);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });
