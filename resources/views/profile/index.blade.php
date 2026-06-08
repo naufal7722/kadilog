@@ -17,7 +17,7 @@
             <div class="absolute -bottom-10 left-8">
                 <div class="w-24 h-24 rounded-2xl bg-white p-1.5 shadow-md">
                     <div class="w-full h-full rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center text-3xl font-bold border border-primary-100">
-                        {{ strtoupper(substr(request()->query('role', 'S'), 0, 1)) }}
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
                     </div>
                 </div>
             </div>
@@ -32,24 +32,54 @@
         <div class="pt-14 px-8 pb-8">
             <div class="mb-8 border-b border-secondary-100 pb-8">
                 <h3 class="text-xl font-bold text-secondary-900 mb-1">
-                    {{ ucfirst(request()->query('role', 'Staff')) }} KasaLog
+                    {{ $user->name }}
                 </h3>
-                <p class="text-secondary-500 text-sm">Role: <span class="font-semibold text-primary-600 capitalize">{{ request()->query('role', 'Staff') }}</span></p>
+                <p class="text-secondary-500 text-sm">Role: <span class="font-semibold text-primary-600 capitalize">{{ $role }}</span></p>
             </div>
 
-            <form class="space-y-6" data-demo-form onsubmit="event.preventDefault(); showToast('Profil berhasil diperbarui!');">
-                <h4 class="font-bold text-secondary-900">Informasi Dasar</h4>
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-success-50 border-l-4 border-success-500 text-success-700 rounded-lg flex items-center gap-3 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="flex-1 text-sm font-medium">{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-danger-50 border border-danger-200 text-danger-700 rounded-xl">
+                    <ul class="list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('profile.update') }}" method="POST" class="space-y-6">
+                @csrf
+                @method('PUT')
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-form-input name="nama" label="Nama Lengkap / Instansi" value="{{ ucfirst(request()->query('role', 'Staff')) }} KasaLog" required />
-                    <x-form-input type="email" name="email" label="Alamat Email" value="admin@kasalog.id" required />
-                    <x-form-input type="text" name="telepon" label="No. Telepon / WhatsApp" value="081234567890" />
+                    <x-form-input name="name" label="Username" value="{{ old('name', $user->name) }}" required />
+                    <x-form-input type="email" name="email" label="Alamat Email" value="{{ old('email', $user->email) }}" required />
+
+                @if($role === 'supplier' && $user->supplier)
+                    <x-form-input name="nama_umkm" label="Nama UMKM" value="{{ old('nama_umkm', $user->supplier->nama_umkm) }}" required />
+                    <x-form-input name="nama_pic" label="Nama PIC" value="{{ old('nama_pic', $user->supplier->nama_pic) }}" required />
+                    <x-form-input name="no_hp_pic" label="No. HP PIC" value="{{ old('no_hp_pic', $user->supplier->no_hp_pic) }}" required />
                     <div class="md:col-span-2">
-                        <x-form-input type="textarea" name="alamat" label="Alamat Lengkap" rows="3" value="Gedung Utama KasaLog, Batam Center" />
+                        <x-form-input type="textarea" name="alamat" label="Alamat Lengkap" rows="3" value="{{ old('alamat', $user->supplier->alamat) }}" required />
                     </div>
+                @elseif($role === 'konsumen' && $user->konsumen)
+                    <x-form-input name="nama_konsumen" label="Nama Konsumen" value="{{ old('nama_konsumen', $user->konsumen->nama_konsumen) }}" required />
+                    <x-form-input name="nama_pic_konsumen" label="Nama PIC Konsumen" value="{{ old('nama_pic_konsumen', $user->konsumen->nama_pic_konsumen) }}" required />
+                @elseif($role === 'operator' && $user->operator)
+                    <x-form-input name="nama_operator" label="Nama Operator" value="{{ old('nama_operator', $user->operator->nama_operator) }}" required />
+                    <x-form-input name="no_hp" label="No. HP" value="{{ old('no_hp', $user->operator->no_hp) }}" required />
+                @endif
                 </div>
 
                 <div class="pt-6 border-t border-secondary-100">
-                    <h4 class="font-bold text-secondary-900 mb-6">Ubah Kata Sandi</h4>
+                    <h4 class="font-bold text-secondary-900 mb-6">Ubah Kata Sandi (Opsional)</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2 max-w-md">
                             <x-form-input type="password" name="old_password" label="Kata Sandi Saat Ini" placeholder="••••••••" />
