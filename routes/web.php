@@ -5,6 +5,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SupplierDashboardController;
 use App\Http\Controllers\OperatorDashboardController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\KonsumenController;
+use App\Http\Controllers\OperatorController;
+use App\Http\Controllers\PelabuhanController;
+use App\Http\Controllers\RuteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +20,7 @@ use App\Http\Controllers\OperatorDashboardController;
 |--------------------------------------------------------------------------
 */
 
-// Landing Page
+// Redirect root ke login
 Route::get('/', fn() => view('landing.index'));
 
 // Auth
@@ -25,58 +30,29 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get ('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+use App\Http\Controllers\DashboardController;
+
 // Dashboard per role
 Route::get('/dashboard/supplier', [SupplierDashboardController::class, 'index'])->middleware('auth');
 Route::get('/dashboard/operator', [OperatorDashboardController::class, 'index'])->middleware('auth');
 
-Route::get('/dashboard/{role?}', function (string $role = 'staff') {
-    $validRoles = ['superadmin', 'staff', 'supplier', 'operator'];
-    $role = in_array($role, $validRoles) ? $role : 'staff';
-    return view("dashboard.{$role}", [
-        'role' => $role,
-        'pageTitle' => 'Dashboard',
-    ]);
-});
+Route::get('/dashboard/{role?}', [DashboardController::class, 'index'])->name('dashboard');
+
 
 // Kelola Supplier
-Route::get('/suppliers', function (Request $request) {
-    return view('suppliers.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Supplier',
-    ]);
-});
+Route::resource('suppliers', SupplierController::class)->middleware('auth');
 
 // Kelola Konsumen
-Route::get('/konsumen', function (Request $request) {
-    return view('konsumen.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Konsumen',
-    ]);
-});
+Route::resource('konsumen', KonsumenController::class)->middleware('auth');
 
 // Kelola Operator
-Route::get('/operators', function (Request $request) {
-    return view('operators.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Operator',
-    ]);
-});
+Route::resource('operators', OperatorController::class)->middleware('auth');
 
 // Kelola Pelabuhan
-Route::get('/pelabuhan', function (Request $request) {
-    return view('pelabuhan.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Pelabuhan',
-    ]);
-});
+Route::resource('pelabuhan', PelabuhanController::class)->middleware('auth');
 
 // Kelola Rute
-Route::get('/rute', function (Request $request) {
-    return view('rute.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Rute',
-    ]);
-});
+Route::resource('rute', RuteController::class)->middleware('auth');
 
 // Order
 Route::get('/orders', function (Request $request) {
