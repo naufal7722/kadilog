@@ -8,6 +8,8 @@ use App\Http\Controllers\OperatorDashboardController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\KonsumenController;
 use App\Http\Controllers\OperatorController;
+use App\Http\Controllers\PelabuhanController;
+use App\Http\Controllers\RuteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +21,7 @@ use App\Http\Controllers\OperatorController;
 */
 
 // Redirect root ke login
-Route::get('/', fn() => redirect('/login'));
+Route::get('/', fn() => view('landing.index'));
 
 // Auth
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -47,20 +49,10 @@ Route::resource('konsumen', KonsumenController::class)->middleware('auth');
 Route::resource('operators', OperatorController::class)->middleware('auth');
 
 // Kelola Pelabuhan
-Route::get('/pelabuhan', function (Request $request) {
-    return view('pelabuhan.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Pelabuhan',
-    ]);
-});
+Route::resource('pelabuhan', PelabuhanController::class)->middleware('auth');
 
 // Kelola Rute
-Route::get('/rute', function (Request $request) {
-    return view('rute.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Rute',
-    ]);
-});
+Route::resource('rute', RuteController::class)->middleware('auth');
 
 // Order
 Route::get('/orders', function (Request $request) {
@@ -103,9 +95,7 @@ Route::get('/status-delivery', function (Request $request) {
 });
 
 // Profil
-Route::get('/profile', function (Request $request) {
-    return view('profile.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Profil Saya',
-    ]);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });
