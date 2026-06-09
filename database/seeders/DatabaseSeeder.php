@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             SupplierSeeder::class,
             KonsumenSeeder::class,
             OperatorSeeder::class,
+            PelabuhanSeeder::class,
+            RuteSeeder::class,
         ]);
     }
 }
