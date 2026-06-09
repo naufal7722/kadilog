@@ -65,7 +65,6 @@
                 <div class="hidden md:flex items-center space-x-10">
                     <a href="#" class="text-secondary-900 font-semibold text-sm border-b-2 border-primary-600 pb-0.5">Beranda</a>
                     <a href="#keunggulan" class="text-secondary-500 hover:text-secondary-900 font-medium text-sm transition-colors">Tentang Kami</a>
-                    <a href="#cek-resi" class="text-secondary-500 hover:text-secondary-900 font-medium text-sm transition-colors">Cek Resi</a>
                 </div>
 
                 {{-- CTA Button --}}
@@ -85,8 +84,7 @@
             <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-secondary-100 mt-2 pt-4 space-y-3">
                 <a href="#" class="block text-secondary-900 font-semibold text-sm py-2">Beranda</a>
                 <a href="#keunggulan" class="block text-secondary-500 hover:text-secondary-900 font-medium text-sm py-2">Tentang Kami</a>
-                <a href="#cek-resi" class="block text-secondary-500 hover:text-secondary-900 font-medium text-sm py-2">Cek Resi</a>
-                <a href="{{ route('login') }}" class="block w-full text-center px-5 py-2.5 text-sm font-semibold rounded-lg text-white bg-secondary-900 hover:bg-secondary-800 transition-colors mt-2">Masuk/Daftar</a>
+             <a href="{{ route('login') }}" class="block w-full text-center px-5 py-2.5 text-sm font-semibold rounded-lg text-white bg-secondary-900 hover:bg-secondary-800 transition-colors mt-2">Masuk/Daftar</a>
             </div>
         </div>
     </nav>
