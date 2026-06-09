@@ -24,7 +24,6 @@ $notifications = [
 
 <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-secondary-200/60">
     <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        {{-- Left: Hamburger + Page Title --}}
         <div class="flex items-center gap-4">
             <button id="sidebar-toggle" class="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,8 +57,6 @@ $notifications = [
                     @endforeach
                 </div>
             </div>
-
-            {{-- Notifications --}}
             <div class="relative">
                 <button id="notif-bell" class="relative flex items-center justify-center w-10 h-10 rounded-xl text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
