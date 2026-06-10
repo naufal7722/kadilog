@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SupplierDashboardController;
 use App\Http\Controllers\OperatorDashboardController;
 use App\Http\Controllers\StatusDeliveryController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,20 +81,9 @@ Route::get('/rute', function (Request $request) {
 });
 
 // Order
-Route::get('/orders', function (Request $request) {
-    return view('orders.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Kelola Order',
-    ]);
-});
-
-Route::get('/orders/{id}', function (Request $request, string $id) {
-    return view('orders.show', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Detail Order',
-        'orderId' => $id,
-    ]);
-});
+Route::get('/orders', [OrderController::class, 'index']);
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders/{kode}', [OrderController::class, 'show']);
 
 // Tracking Delivery
 Route::get('/tracking', function (Request $request) {

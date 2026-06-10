@@ -15,4 +15,14 @@ class Order extends Model
     {
         return $this->hasMany(DetailOrder::class, 'kode_order', 'kode_order');
     }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'kode_supplier', 'kode_supplier');
+    }
+
+    public function konsumen()
+    {
+        return $this->belongsTo(Konsumen::class, 'kode_konsumen', 'kode_konsumen');
+    }
 }

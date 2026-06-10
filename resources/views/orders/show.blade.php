@@ -11,18 +11,26 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3 mb-1">
-                <h2 class="text-2xl font-bold text-secondary-900">ORD-202310-001</h2>
-                <x-badge-status status="Proses Pengiriman Laut" />
+                <h2 class="text-2xl font-bold text-secondary-900">{{ $order->kode_order }}</h2>
+                @php
+                    $status = 'Menunggu ACC';
+                    if ($order->detailOrders && $order->detailOrders->count() > 0) {
+                        $latestDetail = $order->detailOrders->first();
+                        $status = $latestDetail->statusDelivery->nama_status_delivery ?? 'Dalam Proses';
+                    }
+                @endphp
+                <x-badge-status :status="$status" />
             </div>
-            <p class="text-secondary-500">Dibuat pada 24 Okt 2023, 08:30 WIB</p>
+            <p class="text-secondary-500">Dibuat pada {{ $order->created_at->format('d M Y, H:i') }} WIB</p>
         </div>
         <div class="flex gap-2">
+            @if(request('role', 'staff') !== 'staff')
             <a href="/tracking/1?role={{ request('role', 'staff') }}" class="px-4 py-2 bg-white border border-secondary-200 text-secondary-700 rounded-xl hover:bg-secondary-50 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
-                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Lihat Live Tracking
+                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Live Tracking
             </a>
-            @if(request('role') == 'staff' || request('role') == 'superadmin')
-            <button class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium shadow-sm">
+            <button onclick="window.print()" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 Cetak Resi
             </button>
             @endif
@@ -40,27 +48,35 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
                     <div class="col-span-2 sm:col-span-4 p-4 bg-primary-50/50 rounded-xl border border-primary-100">
                         <p class="text-sm text-secondary-500 mb-1">Isi Produk</p>
-                        <p class="font-semibold text-secondary-900 text-lg">Ikan Tuna Beku (Grade A)</p>
-                        <p class="text-sm text-secondary-600 mt-2">Keterangan: Ikan segar hasil tangkapan nelayan Natuna, harus selalu dalam kondisi beku.</p>
+                        <p class="font-semibold text-secondary-900 text-lg">{{ $order->isi_produk }}</p>
+                        <p class="text-sm text-secondary-600 mt-2">Keterangan: {{ $order->deskripsi ?: '-' }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-secondary-500 mb-1">Berat</p>
-                        <p class="font-medium text-secondary-900">150 Kg</p>
+                        <p class="font-medium text-secondary-900">{{ $order->berat }} Kg</p>
                     </div>
                     <div>
                         <p class="text-sm text-secondary-500 mb-1">Dimensi</p>
-                        <p class="font-medium text-secondary-900">100x50x50 cm</p>
+                        <p class="font-medium text-secondary-900">{{ $order->dimensi ?: '-' }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-secondary-500 mb-1">Kemasan Khusus</p>
                         <p class="font-medium text-secondary-900">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 text-warning-800">Iya (Styrofoam)</span>
+                            @if($order->kemasan == 'iya')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 text-warning-800">Iya</span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-100 text-secondary-800">Tidak</span>
+                            @endif
                         </p>
                     </div>
                     <div>
                         <p class="text-sm text-secondary-500 mb-1">Menggunakan Es</p>
                         <p class="font-medium text-secondary-900">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">Iya</span>
+                            @if($order->es)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">Iya</span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-100 text-secondary-800">Tidak</span>
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -74,8 +90,8 @@
                             S
                         </div>
                         <div>
-                            <p class="font-bold text-secondary-900">Bpk. Ahmad (SUP-01)</p>
-                            <p class="text-sm text-secondary-500">0812-3456-7890</p>
+                            <p class="font-bold text-secondary-900">{{ $order->supplier->nama_pic ?? 'Unknown' }} ({{ $order->kode_supplier }})</p>
+                            <p class="text-sm text-secondary-500">{{ $order->supplier->no_hp_pic ?? '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -87,8 +103,8 @@
                             K
                         </div>
                         <div>
-                            <p class="font-bold text-secondary-900">Toko Laris Manis (KON-001)</p>
-                            <p class="text-sm text-secondary-500">Bpk. Sudirman • 0899-8877-6655</p>
+                            <p class="font-bold text-secondary-900">{{ $order->konsumen->nama_konsumen ?? 'Unknown' }} ({{ $order->kode_konsumen }})</p>
+                            <p class="text-sm text-secondary-500">{{ $order->konsumen->nama_pic_konsumen ?? '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -108,25 +124,33 @@
                     <div class="relative">
                         <div class="absolute -left-[33px] top-1 w-4 h-4 rounded-full bg-primary-500 ring-4 ring-white"></div>
                         <p class="text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Pelabuhan Awal (Pengiriman)</p>
-                        <p class="font-semibold text-secondary-900">Pelabuhan Selat Lampa</p>
-                        <p class="text-sm text-secondary-500">Natuna (P-NTN1)</p>
+                        <p class="font-semibold text-secondary-900">{{ $order->pengiriman_awal ?? 'Belum ditentukan' }}</p>
                     </div>
 
                     {{-- Sea Journey --}}
+                    @if($order->detailOrders && $order->detailOrders->count() > 0)
+                    @php $latestDetail = $order->detailOrders->first(); @endphp
                     <div class="relative">
                         <div class="absolute -left-[31px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-secondary-300 ring-4 ring-white"></div>
                         <div class="bg-secondary-50 p-3 rounded-xl border border-secondary-100">
-                            <p class="text-xs font-semibold text-secondary-600 mb-1">Kapal Penyeberangan</p>
-                            <p class="text-sm font-medium text-secondary-900">KM. Sabuk Nusantara 80 (OPR-L01)</p>
+                            <p class="text-xs font-semibold text-secondary-600 mb-1">Kapal Penyeberangan (Rute: {{ $latestDetail->kode_rute }})</p>
+                            <p class="text-sm font-medium text-secondary-900">{{ $latestDetail->operator->nama_operator ?? '-' }} ({{ $latestDetail->kode_operator }})</p>
                         </div>
                     </div>
+                    @else
+                    <div class="relative">
+                        <div class="absolute -left-[31px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-secondary-300 ring-4 ring-white"></div>
+                        <div class="bg-warning-50 p-3 rounded-xl border border-warning-100">
+                            <p class="text-sm font-medium text-warning-900">Menunggu ACC Admin (Belum diassign operator kapal)</p>
+                        </div>
+                    </div>
+                    @endif
 
                     {{-- Destination Port --}}
                     <div class="relative">
                         <div class="absolute -left-[33px] top-1 w-4 h-4 rounded-full border-2 border-primary-500 bg-white ring-4 ring-white"></div>
                         <p class="text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Pelabuhan Tujuan</p>
-                        <p class="font-semibold text-secondary-900">Pelabuhan Batu Ampar</p>
-                        <p class="text-sm text-secondary-500">Batam (P-BTM1)</p>
+                        <p class="font-semibold text-secondary-900">{{ $order->pengiriman_tujuan ?? 'Belum ditentukan' }}</p>
                     </div>
                 </div>
             </div>
