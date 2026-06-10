@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\Rute;
 use App\Models\Operator;
 use App\Models\StatusDelivery;
-use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {

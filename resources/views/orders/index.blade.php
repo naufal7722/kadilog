@@ -180,7 +180,6 @@
     </form>
 </x-modal>
 @endif
-
 @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
 <x-modal id="modal-acc" title="ACC Order & Assign Pengiriman" maxWidth="max-w-xl">
     <form action="/orders/acc?role={{ request('role', 'staff') }}" method="POST" class="space-y-5">
