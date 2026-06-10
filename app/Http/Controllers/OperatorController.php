@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Operator;
+use App\Models\Pelabuhan;
 use Illuminate\Http\Request;
 
 class OperatorController extends Controller
@@ -13,12 +14,16 @@ class OperatorController extends Controller
     public function index(Request $request)
     {
         $role = $request->query('role', 'staff');
-        $operators = Operator::all();
+        // Get operators with their assigned pelabuhan
+        $operators = Operator::with('pelabuhan')->get();
+        // Group pelabuhans by island name for the dropdown
+        $pelabuhans = Pelabuhan::all()->groupBy('nama_pulau');
 
         return view('operators.index', [
             'role' => $role,
             'pageTitle' => 'Kelola Operator',
             'operators' => $operators,
+            'pelabuhans' => $pelabuhans,
         ]);
     }
 
@@ -30,6 +35,7 @@ class OperatorController extends Controller
         $validated = $request->validate([
             'nama_operator' => 'required|string|max:255',
             'no_hp' => 'required|string|max:255',
+            'kode_pelabuhan' => 'required|exists:pelabuhans,kode_pelabuhan',
         ]);
 
         Operator::create($validated);
@@ -47,6 +53,7 @@ class OperatorController extends Controller
         $validated = $request->validate([
             'nama_operator' => 'required|string|max:255',
             'no_hp' => 'required|string|max:255',
+            'kode_pelabuhan' => 'required|exists:pelabuhans,kode_pelabuhan',
         ]);
 
         $operator->update($validated);

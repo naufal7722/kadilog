@@ -21,9 +21,16 @@ class OperatorControllerTest extends TestCase
     {
         $user = User::factory()->create();
         
+        $pelabuhan = \App\Models\Pelabuhan::create([
+            'nama_pelabuhan' => 'Test Port',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang A'
+        ]);
+
         $operator = Operator::create([
             'nama_operator' => 'Test Operator',
             'no_hp' => '0812345678',
+            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
         ]);
 
         $response = $this->actingAs($user)->get('/operators');
@@ -37,9 +44,16 @@ class OperatorControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
+        $pelabuhan = \App\Models\Pelabuhan::create([
+            'nama_pelabuhan' => 'Test Port',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang A'
+        ]);
+
         $response = $this->actingAs($user)->post('/operators', [
             'nama_operator' => 'New Operator',
             'no_hp' => '0898765432',
+            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
         ]);
 
         $response->assertRedirect();
@@ -47,6 +61,7 @@ class OperatorControllerTest extends TestCase
         $this->assertDatabaseHas('operators', [
             'nama_operator' => 'New Operator',
             'no_hp' => '0898765432',
+            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
         ]);
     }
 
@@ -54,14 +69,28 @@ class OperatorControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
+        $pelabuhan1 = \App\Models\Pelabuhan::create([
+            'nama_pelabuhan' => 'Test Port 1',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang 1'
+        ]);
+
+        $pelabuhan2 = \App\Models\Pelabuhan::create([
+            'nama_pelabuhan' => 'Test Port 2',
+            'nama_pulau' => 'Bintan',
+            'nama_gudang' => 'Gudang 2'
+        ]);
+
         $operator = Operator::create([
             'nama_operator' => 'Old Operator',
             'no_hp' => '0812345678',
+            'kode_pelabuhan' => $pelabuhan1->kode_pelabuhan,
         ]);
 
         $response = $this->actingAs($user)->put("/operators/{$operator->kode_operator}", [
             'nama_operator' => 'Updated OperatorName',
             'no_hp' => '0899999999',
+            'kode_pelabuhan' => $pelabuhan2->kode_pelabuhan,
         ]);
 
         $response->assertRedirect();
@@ -70,6 +99,7 @@ class OperatorControllerTest extends TestCase
             'kode_operator' => $operator->kode_operator,
             'nama_operator' => 'Updated OperatorName',
             'no_hp' => '0899999999',
+            'kode_pelabuhan' => $pelabuhan2->kode_pelabuhan,
         ]);
     }
 

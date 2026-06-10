@@ -29,9 +29,13 @@ class UserSeeder extends Seeder
             'nama_pic_konsumen' => 'Ahmad'
         ]);
 
+        // Find a Pelabuhan for the operator (Karimun)
+        $pelabuhanKarimun = \App\Models\Pelabuhan::where('nama_pulau', 'Karimun')->first();
+
         $operator = Operator::create([
-            'nama_operator' => 'Operator Pelabuhan Batam',
-            'no_hp' => '08111222333'
+            'nama_operator' => 'Operator Pelabuhan Karimun',
+            'no_hp' => '08111222333',
+            'kode_pelabuhan' => $pelabuhanKarimun ? $pelabuhanKarimun->kode_pelabuhan : null,
         ]);
 
         // 2. Buat Akun Users dan hubungkan dengan profil

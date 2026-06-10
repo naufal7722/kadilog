@@ -14,7 +14,19 @@ class RuteController extends Controller
     public function index(Request $request)
     {
         $role = $request->query('role', 'staff');
-        $rutes = Rute::with('pelabuhan')->get();
+        
+        $basePelabuhan = null;
+        if (auth()->check() && auth()->user()->role === 'operator' && auth()->user()->operator) {
+            $basePelabuhan = auth()->user()->operator->pelabuhan;
+        }
+
+        $query = Rute::with(['pelabuhanAsal', 'pelabuhanTujuan']);
+        
+        if ($basePelabuhan) {
+            $query->where('kode_pelabuhan_asal', $basePelabuhan->kode_pelabuhan);
+        }
+
+        $rutes = $query->get();
         $pelabuhans = Pelabuhan::all();
 
         return view('rute.index', [
@@ -22,6 +34,7 @@ class RuteController extends Controller
             'pageTitle' => 'Kelola Rute',
             'rutes' => $rutes,
             'pelabuhans' => $pelabuhans,
+            'basePelabuhan' => $basePelabuhan,
         ]);
     }
 
@@ -31,7 +44,10 @@ class RuteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode_pelabuhan' => 'required|exists:pelabuhans,kode_pelabuhan',
+            'kode_pelabuhan_asal' => 'required|exists:pelabuhans,kode_pelabuhan',
+            'kode_pelabuhan_tujuan' => 'required|exists:pelabuhans,kode_pelabuhan|different:kode_pelabuhan_asal',
+            'titik_transit' => 'nullable|array',
+            'titik_transit.*' => 'exists:pelabuhans,kode_pelabuhan',
             'jarak' => 'required|numeric|min:0',
         ]);
 
@@ -48,7 +64,10 @@ class RuteController extends Controller
         $rute = Rute::findOrFail($id);
 
         $validated = $request->validate([
-            'kode_pelabuhan' => 'required|exists:pelabuhans,kode_pelabuhan',
+            'kode_pelabuhan_asal' => 'required|exists:pelabuhans,kode_pelabuhan',
+            'kode_pelabuhan_tujuan' => 'required|exists:pelabuhans,kode_pelabuhan|different:kode_pelabuhan_asal',
+            'titik_transit' => 'nullable|array',
+            'titik_transit.*' => 'exists:pelabuhans,kode_pelabuhan',
             'jarak' => 'required|numeric|min:0',
         ]);
 

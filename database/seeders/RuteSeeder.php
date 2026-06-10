@@ -13,30 +13,61 @@ class RuteSeeder extends Seeder
      */
     public function run(): void
     {
-        // Temukan pelabuhan di Bintan, Natuna, dan Karimun untuk dijadikan destinasi rute dari Batam
-        $bintan = Pelabuhan::where('nama_pulau', 'Bintan')->first();
-        $natuna = Pelabuhan::where('nama_pulau', 'Natuna')->first();
-        $karimun = Pelabuhan::where('nama_pulau', 'Karimun')->first();
+        // Ambil ID pelabuhan yang dibutuhkan sesuai urutan Barat ke Timur
+        $ports = [
+            Pelabuhan::where('nama_pelabuhan', 'Pelabuhan Tanjung Balai Karimun')->first(),
+            Pelabuhan::where('nama_pelabuhan', 'Pelabuhan Sekupang')->first(),
+            Pelabuhan::where('nama_pelabuhan', 'Pelabuhan Batu Ampar')->first(),
+            Pelabuhan::where('nama_pelabuhan', 'Pelabuhan Sri Bintan Pura')->first(),
+            Pelabuhan::where('nama_pelabuhan', 'Pelabuhan Selat Lampa')->first(),
+        ];
 
-        if ($bintan) {
-            Rute::create([
-                'kode_pelabuhan' => $bintan->kode_pelabuhan,
-                'jarak' => 45.00,
-            ]);
+        // Pastikan semua pelabuhan ada
+        foreach ($ports as $port) {
+            if (!$port) return;
         }
 
-        if ($natuna) {
-            Rute::create([
-                'kode_pelabuhan' => $natuna->kode_pelabuhan,
-                'jarak' => 300.00,
-            ]);
-        }
+        // Estimasi jarak kasar antar pelabuhan yang berdekatan (West to East)
+        // Karimun-Sekupang: 35, Sekupang-BatuAmpar: 10, BatuAmpar-Bintan: 20, Bintan-Natuna: 315
+        $distances = [35.00, 10.00, 20.00, 315.00];
 
-        if ($karimun) {
-            Rute::create([
-                'kode_pelabuhan' => $karimun->kode_pelabuhan,
-                'jarak' => 50.00,
-            ]);
+        $totalPorts = count($ports);
+
+        // Buat semua kemungkinan rute (Origin to Destination)
+        for ($i = 0; $i < $totalPorts; $i++) {
+            for ($j = 0; $j < $totalPorts; $j++) {
+                if ($i === $j) continue;
+
+                $origin = $ports[$i];
+                $dest = $ports[$j];
+                $transits = [];
+                $totalJarak = 0;
+
+                if ($i < $j) {
+                    // Arah Timur (Kiri ke Kanan)
+                    for ($k = $i + 1; $k < $j; $k++) {
+                        $transits[] = $ports[$k]->kode_pelabuhan;
+                    }
+                    for ($k = $i; $k < $j; $k++) {
+                        $totalJarak += $distances[$k];
+                    }
+                } else {
+                    // Arah Barat (Kanan ke Kiri)
+                    for ($k = $i - 1; $k > $j; $k--) {
+                        $transits[] = $ports[$k]->kode_pelabuhan;
+                    }
+                    for ($k = $j; $k < $i; $k++) {
+                        $totalJarak += $distances[$k];
+                    }
+                }
+
+                Rute::create([
+                    'kode_pelabuhan_asal' => $origin->kode_pelabuhan,
+                    'kode_pelabuhan_tujuan' => $dest->kode_pelabuhan,
+                    'titik_transit' => $transits,
+                    'jarak' => $totalJarak,
+                ]);
+            }
         }
     }
 }

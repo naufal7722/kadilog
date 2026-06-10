@@ -17,31 +17,31 @@ class PelabuhanSeeder extends Seeder
                 'nama_pelabuhan' => 'Pelabuhan Batu Ampar',
                 'nama_pulau' => 'Batam',
                 'nama_gudang' => 'Gudang Logistik Batam 1',
-                'koordinat' => '1.1615, 104.0042',
+                'koordinat' => '1.16628, 104.00447',
             ],
             [
-                'nama_pelabuhan' => 'Pelabuhan Punggur',
+                'nama_pelabuhan' => 'Pelabuhan Sekupang',
                 'nama_pulau' => 'Batam',
-                'nama_gudang' => 'Gudang Transit Punggur',
-                'koordinat' => '1.0505, 104.1481',
+                'nama_gudang' => 'Gudang Transit Sekupang',
+                'koordinat' => '1.1247129707821863, 103.92663650093392',
             ],
             [
                 'nama_pelabuhan' => 'Pelabuhan Sri Bintan Pura',
                 'nama_pulau' => 'Bintan',
                 'nama_gudang' => 'Gudang Logistik Bintan Utama',
-                'koordinat' => '0.9238, 104.4442',
+                'koordinat' => '0.9319, 104.4367',
             ],
             [
                 'nama_pelabuhan' => 'Pelabuhan Tanjung Balai Karimun',
                 'nama_pulau' => 'Karimun',
                 'nama_gudang' => 'Gudang Transit Karimun',
-                'koordinat' => '1.0028, 103.4286',
+                'koordinat' => '0.9883, 103.4362',
             ],
             [
                 'nama_pelabuhan' => 'Pelabuhan Selat Lampa',
                 'nama_pulau' => 'Natuna',
                 'nama_gudang' => 'Gudang Logistik Natuna',
-                'koordinat' => '3.6766, 108.1256',
+                'koordinat' => '3.6639, 108.1306',
             ],
         ];
 

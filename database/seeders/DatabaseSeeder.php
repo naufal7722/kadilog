@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SupplierSeeder::class,
             KonsumenSeeder::class,
-            OperatorSeeder::class,
             PelabuhanSeeder::class,
+            OperatorSeeder::class,
             RuteSeeder::class,
         ]);
     }

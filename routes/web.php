@@ -10,6 +10,7 @@ use App\Http\Controllers\KonsumenController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PelabuhanController;
 use App\Http\Controllers\RuteController;
+use App\Http\Controllers\StatusDeliveryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,13 +88,7 @@ Route::get('/tracking/{id}', function (Request $request, string $id) {
 });
 
 // Manajemen Status Delivery (Superadmin)
-Route::get('/status-delivery', function (Request $request) {
-    return view('status-delivery.index', [
-        'role' => 'superadmin',
-        'pageTitle' => 'Manajemen Status Delivery',
-    ]);
-});
-
+Route::resource('/status-delivery', StatusDeliveryController::class);
 // Profil
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');

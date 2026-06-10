@@ -48,21 +48,30 @@
                     <tr class="bg-secondary-50 text-secondary-500 text-xs uppercase tracking-wider">
                         <th class="px-6 py-3 font-medium">Kode Operator</th>
                         <th class="px-6 py-3 font-medium">Nama Operator / Kapal</th>
+                        <th class="px-6 py-3 font-medium">Basis Pelabuhan</th>
                         <th class="px-6 py-3 font-medium">No. HP</th>
                         <th class="px-6 py-3 font-medium text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-secondary-100">
                     @forelse ($operators as $operator)
-                    <tr class="table-row-hover operator-row" data-alamat="{{ $operator->nama_operator }}">
+                    <tr class="table-row-hover operator-row" data-alamat="{{ $operator->pelabuhan->nama_pulau ?? '' }}">
                         <td class="px-6 py-4 font-mono text-sm text-secondary-600">{{ $operator->kode_operator }}</td>
                         <td class="px-6 py-4 font-medium text-secondary-900">{{ $operator->nama_operator }}</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">
+                            @if($operator->pelabuhan)
+                                <span class="font-medium">{{ $operator->pelabuhan->nama_pelabuhan }}</span>
+                                <span class="text-xs text-secondary-500 block">Pulau {{ $operator->pelabuhan->nama_pulau }}</span>
+                            @else
+                                <span class="text-secondary-400 italic">Belum Ditentukan</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-sm text-secondary-700">{{ $operator->no_hp }}</td>
                         <td class="px-6 py-4 text-right space-x-1">
-                            <button onclick="handleDetail('{{ $operator->kode_operator }}', '{{ addslashes($operator->nama_operator) }}', '{{ addslashes($operator->no_hp) }}', '{{ $operator->created_at->format('d M Y') }}')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-info-600 hover:bg-info-50 rounded-lg transition-colors" data-tooltip="Detail">
+                            <button onclick="handleDetail('{{ $operator->kode_operator }}', '{{ addslashes($operator->nama_operator) }}', '{{ addslashes($operator->no_hp) }}', '{{ $operator->created_at->format('d M Y') }}', '{{ addslashes($operator->pelabuhan->nama_pelabuhan ?? 'Belum Ditentukan') }}')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-info-600 hover:bg-info-50 rounded-lg transition-colors" data-tooltip="Detail">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
-                            <button onclick="handleEdit('{{ $operator->kode_operator }}', '{{ addslashes($operator->nama_operator) }}', '{{ addslashes($operator->no_hp) }}')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Edit">
+                            <button onclick="handleEdit('{{ $operator->kode_operator }}', '{{ addslashes($operator->nama_operator) }}', '{{ addslashes($operator->no_hp) }}', '{{ $operator->kode_pelabuhan }}')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             </button>
                             <button onclick="handleDelete('{{ $operator->kode_operator }}', '{{ addslashes($operator->nama_operator) }}')" class="inline-flex items-center justify-center p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors" data-tooltip="Hapus">
@@ -101,6 +110,23 @@
         <x-form-input name="nama_operator" label="Nama Operator / Kapal" required />
         <x-form-input type="text" name="no_hp" label="No. Handphone" required />
 
+        <div class="space-y-1.5">
+            <label for="kode_pelabuhan" class="block text-sm font-medium text-secondary-700">
+                Basis Pelabuhan Penugasan <span class="text-danger-500">*</span>
+            </label>
+            <select name="kode_pelabuhan" id="kode_pelabuhan" required
+                    class="w-full px-3.5 py-2.5 bg-white border border-secondary-300 rounded-xl text-sm text-secondary-700 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors outline-none">
+                <option value="">Pilih Pelabuhan...</option>
+                @foreach ($pelabuhans as $pulau => $ports)
+                    <optgroup label="Pulau {{ $pulau }}">
+                        @foreach ($ports as $port)
+                            <option value="{{ $port->kode_pelabuhan }}">{{ $port->nama_pelabuhan }}</option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
+        </div>
+
         <div class="flex justify-end gap-3 pt-6 border-t border-secondary-100">
             <button type="button" onclick="closeModal('modal-form')" class="px-5 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">Batal</button>
             <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-sm">Simpan Data</button>
@@ -128,6 +154,10 @@
             <div>
                 <p class="text-secondary-500 mb-1">No. Handphone</p>
                 <p id="modal-detail-hp" class="font-medium text-secondary-900"></p>
+            </div>
+            <div>
+                <p class="text-secondary-500 mb-1">Basis Pelabuhan</p>
+                <p id="modal-detail-pelabuhan" class="font-medium text-secondary-900"></p>
             </div>
             <div>
                 <p class="text-secondary-500 mb-1">Tanggal Terdaftar</p>
@@ -193,7 +223,7 @@
         openModal('modal-form');
     }
 
-    function handleEdit(kode_operator, nama_operator, no_hp) {
+    function handleEdit(kode_operator, nama_operator, no_hp, kode_pelabuhan) {
         const form = document.querySelector('#modal-form form');
         form.reset();
         form.action = '/operators/' + kode_operator + '?role=' + getRoleQueryParam();
@@ -201,16 +231,17 @@
         document.querySelector('#modal-form h3').textContent = 'Edit Operator';
         
         populateEditModal('modal-form', {
-            nama_operator, no_hp
+            nama_operator, no_hp, kode_pelabuhan
         });
 
         openModal('modal-form');
     }
 
-    function handleDetail(kode, nama, hp, created) {
+    function handleDetail(kode, nama, hp, created, pelabuhan) {
         document.getElementById('modal-detail-title').textContent = nama;
         document.getElementById('modal-detail-subtitle').textContent = kode;
         document.getElementById('modal-detail-hp').textContent = hp;
+        document.getElementById('modal-detail-pelabuhan').textContent = pelabuhan;
         document.getElementById('modal-detail-created').textContent = created;
         openModal('modal-detail');
     }

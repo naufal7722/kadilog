@@ -22,21 +22,28 @@ class RuteControllerTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $pelabuhan = Pelabuhan::create([
-            'nama_pelabuhan' => 'Pelabuhan Bintan',
+        $asal = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Asal',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang Batam',
+        ]);
+        
+        $tujuan = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Tujuan',
             'nama_pulau' => 'Bintan',
             'nama_gudang' => 'Gudang Bintan',
         ]);
 
         $rute = Rute::create([
-            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan->kode_pelabuhan,
             'jarak' => 45.5,
         ]);
 
         $response = $this->actingAs($user)->get('/rute');
 
         $response->assertStatus(200);
-        $response->assertSee('Pelabuhan Bintan');
+        $response->assertSee('Pelabuhan Tujuan');
         $response->assertSee('45.5 Nautical Miles');
     }
 
@@ -44,21 +51,29 @@ class RuteControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $pelabuhan = Pelabuhan::create([
-            'nama_pelabuhan' => 'Pelabuhan Karimun',
+        $asal = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Asal',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang Batam',
+        ]);
+        
+        $tujuan = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Tujuan',
             'nama_pulau' => 'Karimun',
             'nama_gudang' => 'Gudang Karimun',
         ]);
 
         $response = $this->actingAs($user)->post('/rute', [
-            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan->kode_pelabuhan,
             'jarak' => 50,
         ]);
 
         $response->assertRedirect();
         
         $this->assertDatabaseHas('rutes', [
-            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan->kode_pelabuhan,
             'jarak' => 50,
         ]);
     }
@@ -67,25 +82,33 @@ class RuteControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $pelabuhan1 = Pelabuhan::create([
-            'nama_pelabuhan' => 'Pelabuhan Bintan',
+        $asal = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Asal',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang Batam',
+        ]);
+        
+        $tujuan1 = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Tujuan 1',
             'nama_pulau' => 'Bintan',
             'nama_gudang' => 'Gudang Bintan',
         ]);
 
-        $pelabuhan2 = Pelabuhan::create([
-            'nama_pelabuhan' => 'Pelabuhan Natuna',
+        $tujuan2 = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Tujuan 2',
             'nama_pulau' => 'Natuna',
             'nama_gudang' => 'Gudang Natuna',
         ]);
 
         $rute = Rute::create([
-            'kode_pelabuhan' => $pelabuhan1->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan1->kode_pelabuhan,
             'jarak' => 45,
         ]);
 
         $response = $this->actingAs($user)->put("/rute/{$rute->kode_rute}", [
-            'kode_pelabuhan' => $pelabuhan2->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan2->kode_pelabuhan,
             'jarak' => 300,
         ]);
 
@@ -93,7 +116,8 @@ class RuteControllerTest extends TestCase
 
         $this->assertDatabaseHas('rutes', [
             'kode_rute' => $rute->kode_rute,
-            'kode_pelabuhan' => $pelabuhan2->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan2->kode_pelabuhan,
             'jarak' => 300,
         ]);
     }
@@ -102,14 +126,21 @@ class RuteControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $pelabuhan = Pelabuhan::create([
-            'nama_pelabuhan' => 'Pelabuhan Bintan',
+        $asal = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Asal',
+            'nama_pulau' => 'Batam',
+            'nama_gudang' => 'Gudang Batam',
+        ]);
+        
+        $tujuan = Pelabuhan::create([
+            'nama_pelabuhan' => 'Pelabuhan Tujuan',
             'nama_pulau' => 'Bintan',
             'nama_gudang' => 'Gudang Bintan',
         ]);
 
         $rute = Rute::create([
-            'kode_pelabuhan' => $pelabuhan->kode_pelabuhan,
+            'kode_pelabuhan_asal' => $asal->kode_pelabuhan,
+            'kode_pelabuhan_tujuan' => $tujuan->kode_pelabuhan,
             'jarak' => 45,
         ]);
 
