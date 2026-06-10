@@ -21,7 +21,7 @@ use App\Http\Controllers\StatusDeliveryController;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root ke login
+// Landing Page
 Route::get('/', fn() => view('landing.index'));
 
 // Auth
@@ -31,29 +31,58 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get ('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-use App\Http\Controllers\DashboardController;
-
 // Dashboard per role
 Route::get('/dashboard/supplier', [SupplierDashboardController::class, 'index'])->middleware('auth');
 Route::get('/dashboard/operator', [OperatorDashboardController::class, 'index'])->middleware('auth');
 
-Route::get('/dashboard/{role?}', [DashboardController::class, 'index'])->name('dashboard');
-
+Route::get('/dashboard/{role?}', function (string $role = 'staff') {
+    $validRoles = ['superadmin', 'staff', 'supplier', 'operator'];
+    $role = in_array($role, $validRoles) ? $role : 'staff';
+    return view("dashboard.{$role}", [
+        'role' => $role,
+        'pageTitle' => 'Dashboard',
+    ]);
+});
 
 // Kelola Supplier
-Route::resource('suppliers', SupplierController::class)->middleware('auth');
+Route::get('/suppliers', function (Request $request) {
+    return view('suppliers.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Supplier',
+    ]);
+});
 
 // Kelola Konsumen
-Route::resource('konsumen', KonsumenController::class)->middleware('auth');
+Route::get('/konsumen', function (Request $request) {
+    return view('konsumen.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Konsumen',
+    ]);
+});
 
 // Kelola Operator
-Route::resource('operators', OperatorController::class)->middleware('auth');
+Route::get('/operators', function (Request $request) {
+    return view('operators.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Operator',
+    ]);
+});
 
 // Kelola Pelabuhan
-Route::resource('pelabuhan', PelabuhanController::class)->middleware('auth');
+Route::get('/pelabuhan', function (Request $request) {
+    return view('pelabuhan.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Pelabuhan',
+    ]);
+});
 
 // Kelola Rute
-Route::resource('rute', RuteController::class)->middleware('auth');
+Route::get('/rute', function (Request $request) {
+    return view('rute.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Rute',
+    ]);
+});
 
 // Order
 Route::get('/orders', function (Request $request) {
@@ -88,7 +117,11 @@ Route::get('/tracking/{id}', function (Request $request, string $id) {
 });
 
 // Manajemen Status Delivery (Superadmin)
-Route::resource('/status-delivery', StatusDeliveryController::class);
+Route::get('/status-delivery', [StatusDeliveryController::class, 'index'])->name('status-delivery.index');
+Route::post('/status-delivery', [StatusDeliveryController::class, 'store'])->name('status-delivery.store');
+Route::put('/status-delivery/{kode}', [StatusDeliveryController::class, 'update'])->name('status-delivery.update');
+Route::delete('/status-delivery/{kode}', [StatusDeliveryController::class, 'destroy'])->name('status-delivery.destroy');
+
 // Profil
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
