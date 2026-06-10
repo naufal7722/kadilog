@@ -18,7 +18,6 @@ class UserSeeder extends Seeder
     {
         // 1. Buat Data Profil (Supplier, Konsumen, Operator)
         $supplier = Supplier::create([
-            'kode_supplier' => 'SUP-001',
             'nama_umkm' => 'PT. Maju Sejahtera',
             'alamat' => 'Jl. Industri No.1, Batam',
             'nama_pic' => 'Budi Santoso',
@@ -26,15 +25,17 @@ class UserSeeder extends Seeder
         ]);
 
         $konsumen = Konsumen::create([
-            'kode_konsumen' => 'KON-001',
             'nama_konsumen' => 'Toko Laris Natuna',
             'nama_pic_konsumen' => 'Ahmad'
         ]);
 
+        // Find a Pelabuhan for the operator (Karimun)
+        $pelabuhanKarimun = \App\Models\Pelabuhan::where('nama_pulau', 'Karimun')->first();
+
         $operator = Operator::create([
-            'kode_operator' => 'OP-001',
-            'nama_operator' => 'Operator Pelabuhan Batam',
-            'no_hp' => '08111222333'
+            'nama_operator' => 'Operator Pelabuhan Karimun',
+            'no_hp' => '08111222333',
+            'kode_pelabuhan' => $pelabuhanKarimun ? $pelabuhanKarimun->kode_pelabuhan : null,
         ]);
 
         // 2. Buat Akun Users dan hubungkan dengan profil

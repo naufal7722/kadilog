@@ -22,10 +22,10 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <x-stat-card title="Order Perlu Diproses" value="28" icon="order" color="warning" />
-        <x-stat-card title="Total Konsumen" value="1,240" icon="konsumen" color="primary" trend="up" />
-        <x-stat-card title="Rute Aktif" value="45" icon="rute" color="info" />
-        <x-stat-card title="Operator Tersedia" value="8" icon="operator" color="success" />
+        <x-stat-card title="Order Perlu Diproses" value="{{ number_format($orderPending) }}" icon="order" color="warning" />
+        <x-stat-card title="Total Konsumen" value="{{ number_format($totalKonsumen) }}" icon="konsumen" color="primary" />
+        <x-stat-card title="Rute Aktif" value="{{ number_format($totalRute) }}" icon="rute" color="info" />
+        <x-stat-card title="Operator Tersedia" value="{{ number_format($totalOperator) }}" icon="operator" color="success" />
     </div>
 
     {{-- Quick Actions --}}
@@ -81,28 +81,36 @@
                     <tr class="bg-secondary-50 text-secondary-500 text-xs uppercase tracking-wider">
                         <th class="px-6 py-3 font-medium">No Order</th>
                         <th class="px-6 py-3 font-medium">Supplier</th>
-                        <th class="px-6 py-3 font-medium">Rujuan</th>
+                        <th class="px-6 py-3 font-medium">Tujuan</th>
                         <th class="px-6 py-3 font-medium">Status</th>
                         <th class="px-6 py-3 font-medium text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-secondary-100">
+                    @forelse ($recentOrders as $order)
                     <tr class="table-row-hover">
                         <td class="px-6 py-4">
-                            <span class="font-medium text-secondary-900">ORD-2024-101</span>
-                            <span class="block text-xs text-secondary-500 mt-0.5">23 Okt 2024, 10:30</span>
+                            <span class="font-medium text-secondary-900">ORD-{{ $order->kode_order }}</span>
+                            <span class="block text-xs text-secondary-500 mt-0.5">{{ $order->created_at->format('d M Y, H:i') }}</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-secondary-700">PT. Maju Jaya</td>
-                        <td class="px-6 py-4 text-sm text-secondary-700">Batam → Natuna</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">{{ $order->supplier->nama_umkm ?? '-' }}</td>
+                        <td class="px-6 py-4 text-sm text-secondary-700">{{ $order->konsumen->nama_konsumen ?? '-' }}</td>
                         <td class="px-6 py-4">
                             <x-badge-status status="Pending" />
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <a href="/orders/101?role=staff" class="inline-flex items-center justify-center p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Proses Order">
+                            <a href="/orders/{{ $order->kode_order }}?role=staff" class="inline-flex items-center justify-center p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" data-tooltip="Proses Order">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             </a>
                         </td>
                     </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-secondary-500">
+                            Tidak ada order yang menunggu proses.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

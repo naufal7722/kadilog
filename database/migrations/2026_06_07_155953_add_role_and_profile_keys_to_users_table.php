@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('role')->default('konsumen');
-            $table->string('kode_konsumen')->nullable();
-            $table->string('kode_operator')->nullable();
-            $table->string('kode_supplier')->nullable();
+            $table->unsignedBigInteger('kode_konsumen')->nullable();
+            $table->unsignedBigInteger('kode_operator')->nullable();
+            $table->unsignedBigInteger('kode_supplier')->nullable();
 
             $table->foreign('kode_konsumen')->references('kode_konsumen')->on('konsumens')->onDelete('set null');
             $table->foreign('kode_operator')->references('kode_operator')->on('operators')->onDelete('set null');

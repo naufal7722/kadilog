@@ -26,34 +26,25 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <x-stat-card 
             title="Total Order Aktif" 
-            value="142" 
+            value="{{ $totalOrderAktif }}" 
             icon="order" 
-            color="primary" 
-            trend="up" 
-            trendValue="12%" 
-            subtitle="dari bulan lalu" />
+            color="primary" />
             
         <x-stat-card 
-            title="Pengiriman Dalam Perjalanan" 
-            value="86" 
+            title="Pengiriman Aktif" 
+            value="{{ $pengirimanAktif }}" 
             icon="tracking" 
-            color="warning" 
-            trend="up" 
-            trendValue="5%" 
-            subtitle="dari bulan lalu" />
+            color="warning" />
             
         <x-stat-card 
             title="Total Supplier" 
-            value="354" 
+            value="{{ number_format($totalSupplier) }}" 
             icon="supplier" 
-            color="success" 
-            trend="up" 
-            trendValue="24" 
-            subtitle="supplier baru" />
+            color="success" />
             
         <x-stat-card 
             title="Operator Aktif" 
-            value="120" 
+            value="{{ number_format($totalOperator) }}" 
             icon="operator" 
             color="info" />
     </div>
@@ -82,41 +73,23 @@
         <div class="bg-white rounded-2xl border border-secondary-100 shadow-sm p-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-bold text-secondary-900">Aktivitas Terbaru</h3>
-                <a href="#" class="text-sm text-primary-600 font-medium hover:text-primary-700">Lihat Semua</a>
+                <a href="/tracking" class="text-sm text-primary-600 font-medium hover:text-primary-700">Lihat Semua</a>
             </div>
             <div class="space-y-6">
-                <div class="flex gap-4">
-                    <div class="w-10 h-10 rounded-full bg-success-50 text-success-600 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-900">Pesanan Selesai <span class="text-primary-600">#ORD-0921</span></p>
-                        <p class="text-xs text-secondary-500 mt-0.5">Diselesaikan oleh Operator: Budi Santoso</p>
-                        <p class="text-xs text-secondary-400 mt-1.5">10 menit lalu</p>
-                    </div>
-                </div>
-                
-                <div class="flex gap-4">
-                    <div class="w-10 h-10 rounded-full bg-warning-50 text-warning-600 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-900">Status Update <span class="text-primary-600">#ORD-0922</span></p>
-                        <p class="text-xs text-secondary-500 mt-0.5">Status: Dalam Perjalanan ke Pelabuhan</p>
-                        <p class="text-xs text-secondary-400 mt-1.5">45 menit lalu</p>
-                    </div>
-                </div>
-                
+                @forelse ($recentActivities as $activity)
                 <div class="flex gap-4">
                     <div class="w-10 h-10 rounded-full bg-info-50 text-info-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-secondary-900">Order Baru <span class="text-primary-600">#ORD-0923</span></p>
-                        <p class="text-xs text-secondary-500 mt-0.5">Supplier: PT. Maju Jaya</p>
-                        <p class="text-xs text-secondary-400 mt-1.5">2 jam lalu</p>
+                        <p class="text-sm font-medium text-secondary-900">Update Pengiriman <span class="text-primary-600">#ORD-{{ $activity->kode_order }}</span></p>
+                        <p class="text-xs text-secondary-500 mt-0.5">Status: {{ $activity->statusDelivery->nama_status_delivery ?? 'Unknown' }}</p>
+                        <p class="text-xs text-secondary-400 mt-1.5">{{ $activity->updated_at->diffForHumans() }}</p>
                     </div>
                 </div>
+                @empty
+                <div class="text-center text-sm text-secondary-500 py-4">Belum ada aktivitas.</div>
+                @endforelse
             </div>
         </div>
     </div>
