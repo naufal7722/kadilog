@@ -6,7 +6,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SupplierDashboardController;
 use App\Http\Controllers\OperatorDashboardController;
 use App\Http\Controllers\StatusDeliveryController;
-use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +40,7 @@ Route::get('/dashboard/{role?}', function (string $role = 'staff') {
 });
 
 // Kelola Supplier
-Route::get('/suppliers', function (Request $request) {
+Route::get('/supp   liers', function (Request $request) {
     return view('suppliers.index', [
         'role' => $request->query('role', 'staff'),
         'pageTitle' => 'Kelola Supplier',
@@ -81,9 +80,20 @@ Route::get('/rute', function (Request $request) {
 });
 
 // Order
-Route::get('/orders', [OrderController::class, 'index']);
-Route::post('/orders', [OrderController::class, 'store']);
-Route::get('/orders/{kode}', [OrderController::class, 'show']);
+Route::get('/orders', function (Request $request) {
+    return view('orders.index', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Kelola Order',
+    ]);
+});
+
+Route::get('/orders/{id}', function (Request $request, string $id) {
+    return view('orders.show', [
+        'role' => $request->query('role', 'staff'),
+        'pageTitle' => 'Detail Order',
+        'orderId' => $id,
+    ]);
+});
 
 // Tracking Delivery
 Route::get('/tracking', function (Request $request) {
