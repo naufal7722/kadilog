@@ -18,7 +18,7 @@
         <form action="/tracking" method="GET" class="relative w-full sm:w-80">
             <input type="hidden" name="role" value="{{ request('role', 'staff') }}">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-primary-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <svg class="w-5 h-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
             <input type="text" name="search" value="{{ request('search') }}" class="w-full pl-10 pr-24 py-3 bg-white border-2 border-primary-100 rounded-xl text-sm focus:border-primary-500 outline-none shadow-sm transition-colors placeholder:text-secondary-400" placeholder="Masukkan Nomor Order...">
             <button type="submit" class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 transition-colors">
