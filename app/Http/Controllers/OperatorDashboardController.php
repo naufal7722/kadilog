@@ -19,7 +19,7 @@ class OperatorDashboardController extends Controller
         }
 
         // Get all detail orders assigned to this operator
-        $tasks = DetailOrder::with(['order', 'statusDelivery', 'rute.pelabuhan'])
+        $tasks = DetailOrder::with(['order', 'statusDelivery', 'rute.pelabuhanAsal', 'rute.pelabuhanTujuan'])
             ->where('kode_operator', $operator->kode_operator)
             ->get();
 
@@ -66,5 +66,39 @@ class OperatorDashboardController extends Controller
             'jarakBulanIni' => $jarakBulanIni,
             'activeDeliveries' => collect($activeDeliveries)->sortByDesc('created_at')->take(5)
         ]);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $user = Auth::user();
+        $operator = $user->operator;
+
+        if (!$operator) {
+            return redirect('/')->with('error', 'Akses ditolak.');
+        }
+
+        $request->validate([
+            'kode_detail_order' => 'required|exists:detail_orders,kode_detail_order',
+            'kode_status_delivery' => 'required|exists:status_deliveries,kode_status_delivery',
+            'catatan' => 'nullable|string',
+        ]);
+
+        $detailOrder = DetailOrder::where('kode_detail_order', $request->kode_detail_order)
+            ->where('kode_operator', $operator->kode_operator)
+            ->firstOrFail();
+
+        // Insert history
+        \App\Models\TrackingHistory::create([
+            'kode_detail_order' => $detailOrder->kode_detail_order,
+            'kode_status_delivery' => $request->kode_status_delivery,
+            'catatan' => $request->catatan,
+        ]);
+
+        // Update latest status on detail_orders
+        $detailOrder->update([
+            'kode_status_delivery' => $request->kode_status_delivery,
+        ]);
+
+        return redirect()->back()->with('success', 'Status pengiriman berhasil diperbarui!');
     }
 }

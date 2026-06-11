@@ -11,11 +11,11 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3 mb-1">
-                <h2 class="text-2xl font-bold text-secondary-900">{{ $order->kode_order }}</h2>
+                <h2 class="text-2xl font-bold text-secondary-900">{{ $order->isi_produk }}</h2>
                 @php
                     $status = 'Menunggu ACC';
                     if ($order->detailOrders && $order->detailOrders->count() > 0) {
-                        $latestDetail = $order->detailOrders->first();
+                        $latestDetail = $order->detailOrders->sortByDesc('created_at')->first();
                         $status = $latestDetail->statusDelivery->nama_status_delivery ?? 'Dalam Proses';
                     }
                 @endphp
@@ -29,10 +29,7 @@
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Live Tracking
             </a>
-            <button onclick="window.print()" class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Cetak Resi
-            </button>
+          
             @endif
         </div>
     </div>
@@ -90,7 +87,7 @@
                             S
                         </div>
                         <div>
-                            <p class="font-bold text-secondary-900">{{ $order->supplier->nama_pic ?? 'Unknown' }} ({{ $order->kode_supplier }})</p>
+                            <p class="font-bold text-secondary-900">{{ $order->supplier->nama_pic ?? 'Unknown' }}</p>
                             <p class="text-sm text-secondary-500">{{ $order->supplier->no_hp_pic ?? '-' }}</p>
                         </div>
                     </div>
@@ -103,7 +100,7 @@
                             K
                         </div>
                         <div>
-                            <p class="font-bold text-secondary-900">{{ $order->konsumen->nama_konsumen ?? 'Unknown' }} ({{ $order->kode_konsumen }})</p>
+                            <p class="font-bold text-secondary-900">{{ $order->konsumen->nama_konsumen ?? 'Unknown' }}</p>
                             <p class="text-sm text-secondary-500">{{ $order->konsumen->nama_pic_konsumen ?? '-' }}</p>
                         </div>
                     </div>
@@ -124,17 +121,30 @@
                     <div class="relative">
                         <div class="absolute -left-[33px] top-1 w-4 h-4 rounded-full bg-primary-500 ring-4 ring-white"></div>
                         <p class="text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Pelabuhan Awal (Pengiriman)</p>
-                        <p class="font-semibold text-secondary-900">{{ $order->pengiriman_awal ?? 'Belum ditentukan' }}</p>
+                        <p class="font-semibold text-secondary-900">{{ $order->pelabuhanAwal->nama_pelabuhan ?? $order->pengiriman_awal ?? 'Belum ditentukan' }}</p>
                     </div>
 
                     {{-- Sea Journey --}}
                     @if($order->detailOrders && $order->detailOrders->count() > 0)
                     @php $latestDetail = $order->detailOrders->first(); @endphp
+                    
+                    @if($latestDetail->rute && is_array($latestDetail->rute->titik_transit))
+                        @foreach($latestDetail->rute->titik_transit as $transitKode)
+                        <div class="relative">
+                            <div class="absolute -left-[31px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-secondary-300 ring-4 ring-white"></div>
+                            <div class="bg-white p-3 rounded-xl border border-secondary-100">
+                                <p class="text-xs font-semibold text-secondary-500 mb-1">Transit</p>
+                                <p class="text-sm font-medium text-secondary-900">{{ isset($semuaPelabuhan[$transitKode]) ? $semuaPelabuhan[$transitKode]->nama_pelabuhan : $transitKode }}</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    @endif
+
                     <div class="relative">
                         <div class="absolute -left-[31px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-secondary-300 ring-4 ring-white"></div>
                         <div class="bg-secondary-50 p-3 rounded-xl border border-secondary-100">
-                            <p class="text-xs font-semibold text-secondary-600 mb-1">Kapal Penyeberangan (Rute: {{ $latestDetail->kode_rute }})</p>
-                            <p class="text-sm font-medium text-secondary-900">{{ $latestDetail->operator->nama_operator ?? '-' }} ({{ $latestDetail->kode_operator }})</p>
+                            <p class="text-xs font-semibold text-secondary-600 mb-1">Kapal Penyeberangan</p>
+                            <p class="text-sm font-medium text-secondary-900">{{ $latestDetail->operator->nama_operator ?? '-' }}</p>
                         </div>
                     </div>
                     @else
@@ -150,7 +160,7 @@
                     <div class="relative">
                         <div class="absolute -left-[33px] top-1 w-4 h-4 rounded-full border-2 border-primary-500 bg-white ring-4 ring-white"></div>
                         <p class="text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Pelabuhan Tujuan</p>
-                        <p class="font-semibold text-secondary-900">{{ $order->pengiriman_tujuan ?? 'Belum ditentukan' }}</p>
+                        <p class="font-semibold text-secondary-900">{{ $order->pelabuhanTujuan->nama_pelabuhan ?? $order->pengiriman_tujuan ?? 'Belum ditentukan' }}</p>
                     </div>
                 </div>
             </div>

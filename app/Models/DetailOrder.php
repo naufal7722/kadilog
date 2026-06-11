@@ -33,4 +33,9 @@ class DetailOrder extends Model
     {
         return $this->belongsTo(Supplier::class, 'kode_supplier', 'kode_supplier');
     }
+
+    public function histories()
+    {
+        return $this->hasMany(TrackingHistory::class, 'kode_detail_order', 'kode_detail_order')->orderBy('created_at', 'asc');
+    }
 }

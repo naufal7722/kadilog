@@ -14,14 +14,15 @@ class KonsumenSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('id_ID');
-        $kota = ['Batam', 'Bintan', 'Karimun', 'Natuna'];
+        $pelabuhans = \App\Models\Pelabuhan::all();
 
         for ($i = 0; $i < 10; $i++) {
-            $randomKota = $faker->randomElement($kota);
+            $randomPelabuhan = $pelabuhans->random();
             
             Konsumen::create([
-                'nama_konsumen' => 'Toko ' . $faker->company . ' ' . $randomKota,
+                'nama_konsumen' => 'Toko ' . $faker->company . ' ' . $randomPelabuhan->nama_pulau,
                 'nama_pic_konsumen' => $faker->name,
+                'kode_pelabuhan' => $randomPelabuhan->kode_pelabuhan,
             ]);
         }
     }

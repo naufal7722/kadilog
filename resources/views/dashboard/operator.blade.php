@@ -46,7 +46,7 @@
                 @php
                     $statusName = $task->statusDelivery->nama_status_delivery ?? 'Pending';
                     $btnLabel = str_contains(strtolower($statusName), 'menunggu') ? 'Pickup Order' : 'Update Status';
-                    $ruteDesc = $task->rute && $task->rute->pelabuhan ? 'Tujuan: Pelabuhan ' . $task->rute->pelabuhan->nama_pelabuhan : 'Rute tidak diketahui';
+                    $ruteDesc = $task->rute && $task->rute->pelabuhanTujuan ? 'Tujuan: Pelabuhan ' . $task->rute->pelabuhanTujuan->nama_pelabuhan : 'Rute tidak diketahui';
                 @endphp
                 {{-- Task Item --}}
                 <div class="p-5 border-b border-secondary-50 hover:bg-secondary-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -61,7 +61,7 @@
                             {{ $ruteDesc }}
                         </p>
                     </div>
-                    <button onclick="openModal('modal-update-status')" class="shrink-0 px-4 py-2 bg-primary-50 text-primary-600 font-medium rounded-lg hover:bg-primary-100 transition-colors text-sm border border-primary-200">
+                    <button onclick="openModal('modal-update-status-{{ $task->kode_detail_order }}')" class="shrink-0 px-4 py-2 bg-primary-50 text-primary-600 font-medium rounded-lg hover:bg-primary-100 transition-colors text-sm border border-primary-200">
                         {{ $btnLabel }}
                     </button>
                 </div>
@@ -78,34 +78,29 @@
     </div>
 </div>
 
-{{-- Modal Update Status (Mockup) --}}
-<x-modal id="modal-update-status" title="Update Status Pengiriman" maxWidth="max-w-md">
-    <form class="space-y-6" data-demo-form>
+@foreach($activeDeliveries as $task)
+<x-modal id="modal-update-status-{{ $task->kode_detail_order }}" title="Update Status Pengiriman" maxWidth="max-w-md">
+    <form action="{{ route('operator.update-status') }}" method="POST" class="space-y-6">
+        @csrf
+        <input type="hidden" name="kode_detail_order" value="{{ $task->kode_detail_order }}">
+        
         <div class="p-4 bg-secondary-50 rounded-xl border border-secondary-100 mb-2">
             <p class="text-xs text-secondary-500 mb-1">No. Order</p>
-            <p class="font-bold text-secondary-900">#ORD-2024-105</p>
+            <p class="font-bold text-secondary-900">{{ $task->order->kode_order ?? 'Unknown' }}</p>
         </div>
 
-        <x-form-input type="select" name="status" label="Pilih Status Baru" :options="['Dalam Perjalanan ke Gudang' => 'Dalam Perjalanan ke Gudang', 'Tiba di Gudang' => 'Tiba di Gudang', 'Dalam Perjalanan ke Pelabuhan' => 'Dalam Perjalanan ke Pelabuhan', 'Tiba di Pelabuhan Tujuan' => 'Tiba di Pelabuhan Tujuan']" required />
+        @php
+            // We fetch the latest status options from DB, assuming StatusDelivery is passed or we just use a generic select for now. 
+            // Wait, we need the available status from StatusDelivery model.
+            // Since it's not passed, we can query it directly in view for simplicity, or we should pass it from Controller.
+            $statuses = \App\Models\StatusDelivery::pluck('nama_status_delivery', 'kode_status_delivery')->toArray();
+        @endphp
+        <x-form-input type="select" name="kode_status_delivery" label="Pilih Status Baru" :options="$statuses" required />
         
         <x-form-input type="textarea" name="catatan" label="Catatan Tambahan (Opsional)" placeholder="Misal: Kendala lalu lintas, atau kondisi barang..." />
-        
-        {{-- File Upload Dummy --}}
-        <div class="space-y-1.5">
-            <label class="block text-sm font-medium text-secondary-700">Foto Bukti (Opsional)</label>
-            <div class="flex items-center justify-center w-full">
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-secondary-300 border-dashed rounded-xl cursor-pointer bg-secondary-50 hover:bg-secondary-100 transition-colors">
-                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg class="w-8 h-8 mb-3 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <p class="mb-2 text-sm text-secondary-500"><span class="font-semibold text-primary-600">Klik untuk upload</span> atau drag and drop</p>
-                        <p class="text-xs text-secondary-400">PNG, JPG (Max. 2MB)</p>
-                    </div>
-                </label>
-            </div>
-        </div>
 
         <div class="flex justify-end gap-3 pt-6 border-t border-secondary-100">
-            <button type="button" onclick="closeModal('modal-update-status')" class="px-5 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">
+            <button type="button" onclick="closeModal('modal-update-status-{{ $task->kode_detail_order }}')" class="px-5 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">
                 Batal
             </button>
             <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-sm">
@@ -114,4 +109,5 @@
         </div>
     </form>
 </x-modal>
+@endforeach
 @endsection

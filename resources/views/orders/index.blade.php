@@ -53,7 +53,6 @@
                     @forelse($orders as $order)
                     <tr class="table-row-hover">
                         <td class="px-6 py-4">
-                            <div class="font-mono text-sm font-semibold text-primary-700">{{ $order->kode_order }}</div>
                             <div class="text-sm font-medium text-secondary-900 mt-1">{{ $order->isi_produk }}</div>
                             <div class="text-xs text-secondary-500 mt-0.5">{{ $order->berat }} Kg • Es: {{ $order->es ? 'Ya' : 'Tidak' }}</div>
                         </td>
@@ -64,26 +63,37 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-2">
-                                <span class="px-2 py-1 bg-secondary-100 text-secondary-700 text-xs rounded-md">{{ $order->pengiriman_awal ?? '-' }}</span>
+                                <span class="px-2 py-1 bg-secondary-100 text-secondary-700 text-xs rounded-md">{{ $order->pelabuhanAwal->nama_pelabuhan ?? $order->pengiriman_awal ?? '-' }}</span>
                                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                <span class="px-2 py-1 bg-secondary-100 text-secondary-700 text-xs rounded-md">{{ $order->pengiriman_tujuan ?? '-' }}</span>
+                                <span class="px-2 py-1 bg-secondary-100 text-secondary-700 text-xs rounded-md">{{ $order->pelabuhanTujuan->nama_pelabuhan ?? $order->pengiriman_tujuan ?? '-' }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-4">
                             @php
                                 $status = 'Menunggu ACC';
                                 if ($order->detailOrders && $order->detailOrders->count() > 0) {
-                                    $latestDetail = $order->detailOrders->first();
+                                    $latestDetail = $order->detailOrders->sortByDesc('created_at')->first();
                                     $status = $latestDetail->statusDelivery->nama_status_delivery ?? 'Dalam Proses';
                                 }
                             @endphp
                             <x-badge-status :status="$status" />
                         </td>
                         <td class="px-6 py-4 text-right space-x-1 flex justify-end items-center">
-                            @if(in_array(request('role', 'staff'), ['staff', 'superadmin']))
-                            <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-50 border border-success-200 rounded-lg text-sm font-medium text-success-700 hover:bg-success-100 hover:text-success-800 transition-colors shadow-sm mr-2" onclick="openAccModal('{{ $order->kode_order }}', '{{ $order->kode_supplier }}')">
+                            @if(in_array(request('role', 'staff'), ['staff', 'superadmin']) && (!$order->detailOrders || $order->detailOrders->count() === 0))
+                            <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-50 border border-success-200 rounded-lg text-sm font-medium text-success-700 hover:bg-success-100 hover:text-success-800 transition-colors shadow-sm mr-2" onclick="openAccModal('{{ $order->kode_order }}', '{{ $order->kode_supplier }}', '{{ $order->pengiriman_awal }}')">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 ACC Order
+                            </button>
+                            @endif
+
+                            @if(request('role') == 'supplier' && (!$order->detailOrders || $order->detailOrders->count() === 0))
+                            <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-warning-50 border border-warning-200 rounded-lg text-sm font-medium text-warning-700 hover:bg-warning-100 hover:text-warning-800 transition-colors shadow-sm mr-2" data-order="{{ base64_encode(json_encode($order)) }}" onclick="openEditOrderModal(this.dataset.order)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Edit
+                            </button>
+                            <button type="button" onclick="handleDelete('{{ $order->kode_order }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-danger-50 border border-danger-200 rounded-lg text-sm font-medium text-danger-700 hover:bg-danger-100 hover:text-danger-800 transition-colors shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Hapus
                             </button>
                             @endif
                             
@@ -115,7 +125,12 @@
             <div class="space-y-5">
                 <h4 class="text-sm font-bold text-secondary-900 border-b border-secondary-100 pb-2">Informasi Produk</h4>
                 
-                <x-form-input name="kode_konsumen" label="Kode Konsumen (Penerima)" placeholder="Misal: KON-001" required />
+                <div class="mb-4">
+                    <label for="kode_konsumen" class="block text-sm font-medium text-secondary-700 mb-2">Kode Konsumen (Penerima)</label>
+                    <select name="kode_konsumen" id="kode_konsumen" class="w-full px-3.5 py-2.5 bg-white border border-secondary-300 rounded-xl text-sm text-secondary-700 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none" required>
+                        <option value="">Pilih Pelabuhan Tujuan terlebih dahulu...</option>
+                    </select>
+                </div>
                 <x-form-input name="isi_produk" label="Isi Produk" placeholder="Misal: Ikan Segar" required />
                 
                 <div class="grid grid-cols-2 gap-3">
@@ -160,7 +175,11 @@
                 </div>
 
                 <div class="p-4 bg-primary-50/50 border border-primary-100 rounded-xl space-y-4">
-                    <x-form-input type="select" name="pengiriman_awal" label="Pelabuhan Awal (Asal)" :options="['P-NTN1' => 'Pelabuhan Selat Lampa (Natuna)', 'P-BTM1' => 'Pelabuhan Batu Ampar (Batam)']" required />
+                    @if(isset($pelabuhanAwalOptions) && $pelabuhanAwalOptions->count() > 0)
+                        <x-form-input type="select" name="pengiriman_awal" label="Pelabuhan Awal (Asal)" :options="$pelabuhanAwalOptions->pluck('nama_pelabuhan', 'kode_pelabuhan')->toArray()" required />
+                    @else
+                        <x-form-input type="select" name="pengiriman_awal" label="Pelabuhan Awal (Asal)" :options="$semuaPelabuhan->pluck('nama_pelabuhan', 'kode_pelabuhan')->toArray()" required />
+                    @endif
                     
                     <div class="flex justify-center -my-3 relative z-10">
                         <div class="bg-white p-1 rounded-full border border-primary-200 text-primary-500">
@@ -168,7 +187,7 @@
                         </div>
                     </div>
 
-                    <x-form-input type="select" name="pengiriman_tujuan" label="Pelabuhan Tujuan" :options="['P-BTM1' => 'Pelabuhan Batu Ampar (Batam)', 'P-NTN1' => 'Pelabuhan Selat Lampa (Natuna)']" required />
+                    <x-form-input type="select" name="pengiriman_tujuan" label="Pelabuhan Tujuan" :options="$pelabuhanTujuanOptions ? collect($pelabuhanTujuanOptions)->pluck('nama_pelabuhan', 'kode_pelabuhan')->toArray() : []" required />
                 </div>
             </div>
         </div>
@@ -176,6 +195,89 @@
         <div class="flex justify-end gap-3 pt-6 border-t border-secondary-100">
             <button type="button" onclick="closeModal('modal-form')" class="px-5 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">Batal</button>
             <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-sm">Simpan & Buat Order</button>
+        </div>
+    </form>
+</x-modal>
+
+<x-modal id="modal-edit-order" title="Edit Order" maxWidth="max-w-2xl">
+    <form id="form-edit-order" action="" method="POST" class="space-y-6">
+        @csrf
+        @method('PUT')
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- Bagian Kiri: Info Umum & Barang --}}
+            <div class="space-y-5">
+                <h4 class="text-sm font-bold text-secondary-900 border-b border-secondary-100 pb-2">Informasi Produk</h4>
+                
+                <div class="mb-4">
+                    <label for="edit_kode_konsumen" class="block text-sm font-medium text-secondary-700 mb-2">Kode Konsumen (Penerima)</label>
+                    <select name="kode_konsumen" id="edit_kode_konsumen" class="w-full px-3.5 py-2.5 bg-white border border-secondary-300 rounded-xl text-sm text-secondary-700 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none" required>
+                        <option value="">Pilih Pelabuhan Tujuan terlebih dahulu...</option>
+                    </select>
+                </div>
+                <x-form-input name="isi_produk" id="edit_isi_produk" label="Isi Produk" placeholder="Misal: Ikan Segar" required />
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <x-form-input type="number" name="berat" id="edit_berat" label="Berat (Kg)" placeholder="0" required />
+                    <x-form-input name="dimensi" id="edit_dimensi" label="Dimensi (PxLxT)" placeholder="Misal: 50x50x50 cm" required />
+                </div>
+                
+                <x-form-input type="textarea" name="deskripsi" id="edit_deskripsi" label="Deskripsi / Catatan" rows="2" />
+            </div>
+
+            {{-- Bagian Kanan: Packaging & Rute Laut --}}
+            <div class="space-y-5">
+                <h4 class="text-sm font-bold text-secondary-900 border-b border-secondary-100 pb-2">Packaging & Rute</h4>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-secondary-700 mb-2">Butuh Kemasan Khusus?</label>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="kemasan" id="edit_kemasan_iya" value="iya" class="text-primary-600 focus:ring-primary-500">
+                                <span class="text-sm text-secondary-700">Iya</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="kemasan" id="edit_kemasan_tidak" value="tidak" class="text-primary-600 focus:ring-primary-500">
+                                <span class="text-sm text-secondary-700">Tidak</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-secondary-700 mb-2">Menggunakan Es?</label>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="es" id="edit_es_iya" value="iya" class="text-primary-600 focus:ring-primary-500">
+                                <span class="text-sm text-secondary-700">Iya</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="es" id="edit_es_tidak" value="tidak" class="text-primary-600 focus:ring-primary-500">
+                                <span class="text-sm text-secondary-700">Tidak</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-warning-50/50 border border-warning-100 rounded-xl space-y-4">
+                    @if(isset($pelabuhanAwalOptions) && $pelabuhanAwalOptions->count() > 0)
+                        <x-form-input type="select" id="edit_pengiriman_awal" name="pengiriman_awal" label="Pelabuhan Awal (Asal)" :options="$pelabuhanAwalOptions->pluck('nama_pelabuhan', 'kode_pelabuhan')->toArray()" required />
+                    @else
+                        <x-form-input type="select" id="edit_pengiriman_awal" name="pengiriman_awal" label="Pelabuhan Awal (Asal)" :options="$semuaPelabuhan->pluck('nama_pelabuhan', 'kode_pelabuhan')->toArray()" required />
+                    @endif
+                    
+                    <div class="flex justify-center -my-3 relative z-10">
+                        <div class="bg-white p-1 rounded-full border border-warning-200 text-warning-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                        </div>
+                    </div>
+
+                    <x-form-input type="select" id="edit_pengiriman_tujuan" name="pengiriman_tujuan" label="Pelabuhan Tujuan" :options="$pelabuhanTujuanOptions ? collect($pelabuhanTujuanOptions)->pluck('nama_pelabuhan', 'kode_pelabuhan')->toArray() : []" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-6 border-t border-secondary-100">
+            <button type="button" onclick="closeModal('modal-edit-order')" class="px-5 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">Batal</button>
+            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-warning-600 rounded-xl hover:bg-warning-700 transition-colors shadow-sm">Simpan Perubahan</button>
         </div>
     </form>
 </x-modal>
@@ -198,23 +300,13 @@
         <input type="hidden" name="kode_supplier" id="input_kode_supplier">
         
         <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-secondary-700 mb-1">Pilih Rute Pelayaran <span class="text-danger-500">*</span></label>
-                <select name="kode_rute" class="w-full px-3.5 py-2.5 bg-white border border-secondary-300 rounded-xl text-sm text-secondary-700 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none" required>
-                    <option value="">Pilih Rute...</option>
-                    @foreach($rutes ?? [] as $rute)
-                        <option value="{{ $rute->kode_rute }}">{{ $rute->kode_rute }} - Menuju {{ $rute->pelabuhan->nama_pelabuhan ?? 'Unknown' }} ({{ $rute->jarak }} mil)</option>
-                    @endforeach
-                </select>
-            </div>
+
 
             <div>
                 <label class="block text-sm font-medium text-secondary-700 mb-1">Assign Operator / Kapal <span class="text-danger-500">*</span></label>
                 <select name="kode_operator" class="w-full px-3.5 py-2.5 bg-white border border-secondary-300 rounded-xl text-sm text-secondary-700 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none" required>
                     <option value="">Pilih Operator...</option>
-                    @foreach($operators ?? [] as $operator)
-                        <option value="{{ $operator->kode_operator }}">{{ $operator->kode_operator }} - {{ $operator->nama_operator }}</option>
-                    @endforeach
+                    <!-- Options populated by Javascript -->
                 </select>
             </div>
 
@@ -238,14 +330,141 @@
 </x-modal>
 @endif
 
+{{-- Hidden Delete Form --}}
+<form id="delete-form" method="POST" class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
+
 @section('scripts')
 <script>
-    function openAccModal(kodeOrder, kodeSupplier) {
+    function openAccModal(kodeOrder, kodeSupplier, pengirimanAwal) {
         document.getElementById('acc-kode-order').textContent = kodeOrder;
         document.getElementById('input_kode_order').value = kodeOrder;
         document.getElementById('input_kode_supplier').value = kodeSupplier;
+
+        const semuaOperators = @json($operators ?? []);
+        const operatorSelect = document.querySelector('select[name="kode_operator"]');
+        
+        // Kosongkan dan filter operator berdasarkan pengiriman_awal
+        operatorSelect.innerHTML = '<option value="">Pilih Operator...</option>';
+        const filteredOperators = semuaOperators.filter(o => o.kode_pelabuhan == pengirimanAwal);
+        
+        if (filteredOperators.length > 0) {
+            filteredOperators.forEach(o => {
+                const option = document.createElement('option');
+                option.value = o.kode_operator;
+                option.textContent = o.kode_operator + ' - ' + o.nama_operator;
+                operatorSelect.appendChild(option);
+            });
+        } else {
+            operatorSelect.innerHTML = '<option value="">Tidak ada operator di pelabuhan ini</option>';
+        }
+
         openModal('modal-acc');
     }
+
+    function openEditOrderModal(encodedOrder) {
+        let order;
+        try {
+            order = JSON.parse(atob(encodedOrder));
+        } catch (e) {
+            console.error("Failed to parse order JSON", e);
+            return;
+        }
+
+        document.getElementById('form-edit-order').action = '/orders/' + order.kode_order + '?role=supplier';
+        
+        document.getElementById('edit_isi_produk').value = order.isi_produk;
+        document.getElementById('edit_berat').value = order.berat;
+        document.getElementById('edit_dimensi').value = order.dimensi;
+        document.getElementById('edit_deskripsi').value = order.deskripsi || '';
+        
+        if (order.kemasan == 'iya' || order.kemasan == '1') {
+            document.getElementById('edit_kemasan_iya').checked = true;
+        } else {
+            document.getElementById('edit_kemasan_tidak').checked = true;
+        }
+
+        if (order.es == 'iya' || order.es == '1' || order.es == true) {
+            document.getElementById('edit_es_iya').checked = true;
+        } else {
+            document.getElementById('edit_es_tidak').checked = true;
+        }
+
+        document.getElementById('edit_pengiriman_awal').value = order.pengiriman_awal;
+        
+        const pelabuhanTujuanSelect = document.getElementById('edit_pengiriman_tujuan');
+        pelabuhanTujuanSelect.value = order.pengiriman_tujuan;
+        
+        // Trigger change to populate konsumen based on selected tujuan
+        pelabuhanTujuanSelect.dispatchEvent(new Event('change'));
+        
+        // Timeout to wait for the options to be populated before setting the value
+        setTimeout(() => {
+            document.getElementById('edit_kode_konsumen').value = order.kode_konsumen;
+        }, 100);
+
+        openModal('modal-edit-order');
+    }
+
+    function handleDelete(kodeOrder) {
+        confirmDelete('Pesanan ' + kodeOrder, function() {
+            const form = document.getElementById('delete-form');
+            form.action = '/orders/' + kodeOrder + '?role=supplier';
+            form.submit();
+        });
+    }
+
+    @if(request('role') == 'supplier')
+    document.addEventListener('DOMContentLoaded', function() {
+        const semuaKonsumen = @json($semuaKonsumen ?? []);
+        const semuaPelabuhan = @json($semuaPelabuhan ?? []);
+
+        function initKonsumenDropdown(tujuanSelectId, konsumenSelectId) {
+            const pelabuhanTujuanSelect = document.getElementById(tujuanSelectId);
+            const konsumenSelect = document.getElementById(konsumenSelectId);
+            
+            if (pelabuhanTujuanSelect && konsumenSelect) {
+                pelabuhanTujuanSelect.addEventListener('change', function() {
+                    const selectedPelabuhanKode = this.value;
+                    const targetPelabuhan = semuaPelabuhan.find(p => p.kode_pelabuhan == selectedPelabuhanKode);
+                    
+                    konsumenSelect.innerHTML = '<option value="">Pilih Konsumen...</option>';
+                    
+                    if (targetPelabuhan) {
+                        const targetPulau = targetPelabuhan.nama_pulau;
+                        const filteredKonsumen = semuaKonsumen.filter(k => k.pelabuhan && k.pelabuhan.nama_pulau === targetPulau);
+                        
+                        if (filteredKonsumen.length > 0) {
+                            filteredKonsumen.forEach(k => {
+                                const option = document.createElement('option');
+                                option.value = k.kode_konsumen;
+                                option.textContent = k.nama_konsumen + ' (PIC: ' + k.nama_pic_konsumen + ')';
+                                konsumenSelect.appendChild(option);
+                            });
+                        } else {
+                            konsumenSelect.innerHTML = '<option value="">Tidak ada konsumen di wilayah ini</option>';
+                        }
+                    }
+                });
+
+                if (pelabuhanTujuanSelect.value) {
+                    pelabuhanTujuanSelect.dispatchEvent(new Event('change'));
+                }
+            }
+        }
+
+        // Initialize for Create Form (tujuan is by default named pengiriman_tujuan, konsumen is kode_konsumen)
+        const createTujuanSelect = document.querySelector('#modal-form select[name="pengiriman_tujuan"]');
+        if (createTujuanSelect) createTujuanSelect.id = 'create_pengiriman_tujuan';
+        
+        initKonsumenDropdown('create_pengiriman_tujuan', 'kode_konsumen');
+        
+        // Initialize for Edit Form
+        initKonsumenDropdown('edit_pengiriman_tujuan', 'edit_kode_konsumen');
+    });
+    @endif
 </script>
 @endsection
 @endsection

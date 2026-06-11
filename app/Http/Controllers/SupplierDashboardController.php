@@ -21,7 +21,7 @@ class SupplierDashboardController extends Controller
 
         $orders = Order::with(['detailOrders' => function($query) {
             $query->latest('created_at');
-        }, 'detailOrders.statusDelivery', 'detailOrders.rute.pelabuhan'])
+        }, 'detailOrders.statusDelivery', 'detailOrders.rute.pelabuhanAsal', 'detailOrders.rute.pelabuhanTujuan'])
         ->where('kode_supplier', $supplier->kode_supplier)
         ->get();
 

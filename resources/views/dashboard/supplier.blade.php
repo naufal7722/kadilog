@@ -41,7 +41,7 @@
                 @php
                     $latestDetail = $order->detailOrders->first();
                     $statusName = $latestDetail->statusDelivery->nama_status_delivery ?? 'Pending';
-                    $pelabuhanTujuan = $latestDetail->rute->pelabuhan->nama_pelabuhan ?? 'Tidak diketahui';
+                    $pelabuhanTujuan = $latestDetail->rute->pelabuhanTujuan->nama_pelabuhan ?? 'Tidak diketahui';
                     // We don't have explicit origin per order hop in this simple schema easily accessible, so we show destination for now
                 @endphp
                 {{-- Tracking Card --}}
@@ -59,8 +59,7 @@
                             Tujuan: {{ $pelabuhanTujuan }}
                         </div>
                     </div>
-                    <div class="pt-4 border-t border-secondary-100 flex justify-between items-center">
-                        <p class="text-xs text-secondary-500">Estimasi tiba: <span class="font-medium text-secondary-700">{{ $order->pengiriman_tujuan ? \Carbon\Carbon::parse($order->pengiriman_tujuan)->format('d M Y') : '-' }}</span></p>
+                    <div class="pt-4 border-t border-secondary-100 flex justify-end items-center">
                         <a href="/tracking/{{ $order->kode_order }}?role=supplier" class="text-sm text-primary-600 font-medium hover:text-primary-700">Cek Posisi →</a>
                     </div>
                 </div>

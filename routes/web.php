@@ -11,7 +11,10 @@ use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PelabuhanController;
 use App\Http\Controllers\RuteController;
 use App\Http\Controllers\StatusDeliveryController;
-
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | KasaLog - Frontend Routes (UI/UX Only)
@@ -34,6 +37,7 @@ Route::get ('/logout', [AuthController::class, 'logout'])->name('logout');
 // Dashboard per role
 Route::get('/dashboard/supplier', [SupplierDashboardController::class, 'index'])->middleware('auth');
 Route::get('/dashboard/operator', [OperatorDashboardController::class, 'index'])->middleware('auth');
+Route::post('/operator/update-status', [OperatorDashboardController::class, 'updateStatus'])->name('operator.update-status')->middleware('auth');
 
 Route::get('/dashboard/{role?}', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -58,7 +62,10 @@ Route::delete('/rute/{rute}', [RuteController::class, 'destroy'])->name('rute.de
 // Order
 Route::get('/orders', [OrderController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
+Route::post('/orders/acc', [OrderController::class, 'acc'])->name('order.acc');
 Route::get('/orders/{kode}', [OrderController::class, 'show']);
+Route::put('/orders/{kode}', [OrderController::class, 'update'])->name('order.update');
+Route::delete('/orders/{kode}', [OrderController::class, 'destroy'])->name('order.destroy');
 
 Route::get('/orders/{id}', function (Request $request, string $id) {
     return view('orders.show', [
@@ -68,21 +75,12 @@ Route::get('/orders/{id}', function (Request $request, string $id) {
     ]);
 });
 
-// Tracking Delivery
-Route::get('/tracking', function (Request $request) {
-    return view('tracking.index', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Tracking Delivery',
-    ]);
-});
+use App\Http\Controllers\TrackingController;
 
-Route::get('/tracking/{id}', function (Request $request, string $id) {
-    return view('tracking.show', [
-        'role' => $request->query('role', 'staff'),
-        'pageTitle' => 'Detail Tracking',
-        'trackingId' => $id,
-    ]);
-});
+// Tracking Delivery
+Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+
+Route::get('/tracking/{kode}', [TrackingController::class, 'show'])->name('tracking.show');
 
 // Manajemen Status Delivery (Superadmin)
 Route::get('/status-delivery', [StatusDeliveryController::class, 'index'])->name('status-delivery.index');

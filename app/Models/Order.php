@@ -23,4 +23,14 @@ class Order extends Model
     {
         return $this->belongsTo(Konsumen::class, 'kode_konsumen', 'kode_konsumen');
     }
+
+    public function pelabuhanAwal()
+    {
+        return $this->belongsTo(Pelabuhan::class, 'pengiriman_awal', 'kode_pelabuhan');
+    }
+
+    public function pelabuhanTujuan()
+    {
+        return $this->belongsTo(Pelabuhan::class, 'pengiriman_tujuan', 'kode_pelabuhan');
+    }
 }

@@ -16,17 +16,22 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $pelabuhanBatam = \App\Models\Pelabuhan::where('nama_pulau', 'Batam')->first();
+        $pelabuhanNatuna = \App\Models\Pelabuhan::where('nama_pulau', 'Natuna')->first();
+
         // 1. Buat Data Profil (Supplier, Konsumen, Operator)
         $supplier = Supplier::create([
             'nama_umkm' => 'PT. Maju Sejahtera',
             'alamat' => 'Jl. Industri No.1, Batam',
             'nama_pic' => 'Budi Santoso',
-            'no_hp_pic' => '081234567890'
+            'no_hp_pic' => '081234567890',
+            'kode_pelabuhan' => $pelabuhanBatam ? $pelabuhanBatam->kode_pelabuhan : null,
         ]);
 
         $konsumen = Konsumen::create([
             'nama_konsumen' => 'Toko Laris Natuna',
-            'nama_pic_konsumen' => 'Ahmad'
+            'nama_pic_konsumen' => 'Ahmad',
+            'kode_pelabuhan' => $pelabuhanNatuna ? $pelabuhanNatuna->kode_pelabuhan : null,
         ]);
 
         // Find a Pelabuhan for the operator (Karimun)
