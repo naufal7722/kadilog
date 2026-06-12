@@ -15,10 +15,8 @@
         <div class="relative z-10 flex flex-col justify-between w-full p-12">
             {{-- Logo --}}
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center border border-white/20">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
+                <div class="w-11 h-11 flex items-center justify-center">
+                    <img src="{{ asset('img/logo_kasalog.png') }}" alt="Logo KasaLog" class="w-full h-full object-contain">
                 </div>
                 <span class="text-2xl font-bold text-white tracking-tight">KasaLog</span>
             </div>
@@ -75,10 +73,8 @@
         <div class="w-full max-w-md space-y-8">
             {{-- Mobile Logo --}}
             <div class="lg:hidden flex items-center justify-center gap-3 mb-8">
-                <div class="w-11 h-11 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
+                <div class="w-11 h-11 flex items-center justify-center">
+                    <img src="{{ asset('img/logo_kasalog.png') }}" alt="Logo KasaLog" class="w-full h-full object-contain">
                 </div>
                 <span class="text-2xl font-bold text-secondary-900 tracking-tight">KasaLog</span>
             </div>
