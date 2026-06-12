@@ -44,10 +44,8 @@ $items = $menuItems[$role] ?? $menuItems['staff'];
     {{-- Logo Area --}}
     <div class="flex items-center justify-between h-16 px-5 border-b border-white/10">
         <a href="/dashboard/{{ $role }}" class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-gradient-to-br from-primary-400 to-accent-500 rounded-xl flex items-center justify-center shadow-lg">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
+            <div class="w-9 h-9 flex items-center justify-center">
+                <img src="{{ asset('img/logo_kasalog.png') }}" alt="Logo KasaLog" class="w-full h-full object-cover rounded-full">
             </div>
             <span class="sidebar-text text-lg font-bold tracking-tight">KasaLog</span>
         </a>
