@@ -71,7 +71,9 @@ class OrderController extends Controller
             'kode_konsumen' => 'required|string',
             'isi_produk' => 'required|string',
             'berat' => 'required|numeric',
-            'dimensi' => 'required|string',
+            'panjang' => 'required|numeric',
+            'lebar' => 'required|numeric',
+            'tinggi' => 'required|numeric',
             'deskripsi' => 'nullable|string',
             'kemasan' => 'required|string',
             'es' => 'required|string',
@@ -87,7 +89,7 @@ class OrderController extends Controller
             'kode_supplier' => auth()->user()->kode_supplier,
             'isi_produk' => $request->isi_produk,
             'berat' => $request->berat,
-            'dimensi' => $request->dimensi,
+            'dimensi' => $request->panjang . 'x' . $request->lebar . 'x' . $request->tinggi,
             'deskripsi' => $request->deskripsi,
             'kemasan' => $request->kemasan,
             'es' => $request->es === 'iya' ? true : false,
@@ -174,7 +176,9 @@ class OrderController extends Controller
             'kode_konsumen' => 'required|string',
             'isi_produk' => 'required|string',
             'berat' => 'required|numeric',
-            'dimensi' => 'required|string',
+            'panjang' => 'required|numeric',
+            'lebar' => 'required|numeric',
+            'tinggi' => 'required|numeric',
             'deskripsi' => 'nullable|string',
             'kemasan' => 'required|string',
             'es' => 'required|string',
@@ -185,7 +189,7 @@ class OrderController extends Controller
         $order->update([
             'isi_produk' => $request->isi_produk,
             'berat' => $request->berat,
-            'dimensi' => $request->dimensi,
+            'dimensi' => $request->panjang . 'x' . $request->lebar . 'x' . $request->tinggi,
             'deskripsi' => $request->deskripsi,
             'kemasan' => $request->kemasan,
             'es' => $request->es === 'iya' ? true : false,
@@ -213,8 +217,8 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Order tidak dapat dihapus karena sudah diproses (di-ACC).');
         }
 
-        $order->delete();
+        $order->update(['is_cancelled' => true]);
 
-        return redirect()->back()->with('success', 'Order berhasil dibatalkan dan dihapus!');
+        return redirect()->back()->with('success', 'Order berhasil dibatalkan!');
     }
 }

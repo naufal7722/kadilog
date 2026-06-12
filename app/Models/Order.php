@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $primaryKey = 'kode_order';
-    protected $fillable = ['kode_supplier', 'isi_produk', 'berat', 'dimensi', 'deskripsi', 'kemasan', 'es', 'pengiriman_awal', 'pengiriman_tujuan', 'kode_konsumen'];
+    protected $fillable = ['kode_supplier', 'isi_produk', 'berat', 'dimensi', 'deskripsi', 'kemasan', 'es', 'pengiriman_awal', 'pengiriman_tujuan', 'kode_konsumen', 'is_cancelled'];
+
+    protected $casts = [
+        'es' => 'boolean',
+        'is_cancelled' => 'boolean',
+    ];
 
     public function detailOrders()
     {

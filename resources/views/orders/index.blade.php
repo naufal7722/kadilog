@@ -57,9 +57,9 @@
                             <div class="text-xs text-secondary-500 mt-0.5">{{ $order->berat }} Kg • Es: {{ $order->es ? 'Ya' : 'Tidak' }}</div>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="text-sm font-medium text-secondary-900">{{ $order->kode_supplier }} ({{ $order->supplier->nama_pic ?? 'Unknown' }})</div>
+                            <div class="text-sm font-medium text-secondary-900">{{ $order->supplier->nama_pic ?? 'Unknown' }}</div>
                             <svg class="w-3 h-3 text-secondary-400 my-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                            <div class="text-sm text-secondary-700">{{ $order->kode_konsumen }} ({{ $order->konsumen->nama_konsumen ?? 'Unknown' }})</div>
+                            <div class="text-sm text-secondary-700">{{ $order->konsumen->nama_konsumen ?? 'Unknown' }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-2">
@@ -71,7 +71,9 @@
                         <td class="px-6 py-4">
                             @php
                                 $status = 'Menunggu ACC';
-                                if ($order->detailOrders && $order->detailOrders->count() > 0) {
+                                if ($order->is_cancelled) {
+                                    $status = 'Dibatalkan';
+                                } elseif ($order->detailOrders && $order->detailOrders->count() > 0) {
                                     $latestDetail = $order->detailOrders->sortByDesc('created_at')->first();
                                     $status = $latestDetail->statusDelivery->nama_status_delivery ?? 'Dalam Proses';
                                 }
@@ -79,21 +81,21 @@
                             <x-badge-status :status="$status" />
                         </td>
                         <td class="px-6 py-4 text-right space-x-1 flex justify-end items-center">
-                            @if(in_array(request('role', 'staff'), ['staff', 'superadmin']) && (!$order->detailOrders || $order->detailOrders->count() === 0))
+                            @if(in_array(request('role', 'staff'), ['staff', 'superadmin']) && !$order->is_cancelled && (!$order->detailOrders || $order->detailOrders->count() === 0))
                             <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-50 border border-success-200 rounded-lg text-sm font-medium text-success-700 hover:bg-success-100 hover:text-success-800 transition-colors shadow-sm mr-2" onclick="openAccModal('{{ $order->kode_order }}', '{{ $order->kode_supplier }}', '{{ $order->pengiriman_awal }}')">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 ACC Order
                             </button>
                             @endif
 
-                            @if(request('role') == 'supplier' && (!$order->detailOrders || $order->detailOrders->count() === 0))
+                            @if(request('role') == 'supplier' && !$order->is_cancelled && (!$order->detailOrders || $order->detailOrders->count() === 0))
                             <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-warning-50 border border-warning-200 rounded-lg text-sm font-medium text-warning-700 hover:bg-warning-100 hover:text-warning-800 transition-colors shadow-sm mr-2" data-order="{{ base64_encode(json_encode($order)) }}" onclick="openEditOrderModal(this.dataset.order)">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 Edit
                             </button>
-                            <button type="button" onclick="handleDelete('{{ $order->kode_order }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-danger-50 border border-danger-200 rounded-lg text-sm font-medium text-danger-700 hover:bg-danger-100 hover:text-danger-800 transition-colors shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                Hapus
+                            <button type="button" onclick="handleCancel('{{ $order->kode_order }}', '{{ addslashes($order->isi_produk) }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-secondary-100 border border-secondary-200 rounded-lg text-sm font-medium text-secondary-700 hover:bg-secondary-200 hover:text-secondary-800 transition-colors shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Batalkan
                             </button>
                             @endif
                             
@@ -133,9 +135,17 @@
                 </div>
                 <x-form-input name="isi_produk" label="Isi Produk" placeholder="Misal: Ikan Segar" required />
                 
-                <div class="grid grid-cols-2 gap-3">
-                    <x-form-input type="number" name="berat" label="Berat (Kg)" placeholder="0" required />
-                    <x-form-input name="dimensi" label="Dimensi (PxLxT)" placeholder="Misal: 50x50x50 cm" required />
+                <x-form-input type="number" name="berat" label="Berat (Kg)" placeholder="0" required />
+                
+                <div>
+                    <label class="block text-sm font-medium text-secondary-700 mb-1">Dimensi (PxLxT) cm <span class="text-danger-500">*</span></label>
+                    <div class="flex gap-2">
+                        <input type="number" name="panjang" placeholder="P" required class="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                        <span class="text-secondary-400 self-center">x</span>
+                        <input type="number" name="lebar" placeholder="L" required class="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                        <span class="text-secondary-400 self-center">x</span>
+                        <input type="number" name="tinggi" placeholder="T" required class="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                    </div>
                 </div>
                 
                 <x-form-input type="textarea" name="deskripsi" label="Deskripsi / Catatan" rows="2" />
@@ -216,9 +226,17 @@
                 </div>
                 <x-form-input name="isi_produk" id="edit_isi_produk" label="Isi Produk" placeholder="Misal: Ikan Segar" required />
                 
-                <div class="grid grid-cols-2 gap-3">
-                    <x-form-input type="number" name="berat" id="edit_berat" label="Berat (Kg)" placeholder="0" required />
-                    <x-form-input name="dimensi" id="edit_dimensi" label="Dimensi (PxLxT)" placeholder="Misal: 50x50x50 cm" required />
+                <x-form-input type="number" name="berat" id="edit_berat" label="Berat (Kg)" placeholder="0" required />
+                
+                <div>
+                    <label class="block text-sm font-medium text-secondary-700 mb-1">Dimensi (PxLxT) cm <span class="text-danger-500">*</span></label>
+                    <div class="flex gap-2">
+                        <input type="number" name="panjang" id="edit_panjang" placeholder="P" required class="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                        <span class="text-secondary-400 self-center">x</span>
+                        <input type="number" name="lebar" id="edit_lebar" placeholder="L" required class="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                        <span class="text-secondary-400 self-center">x</span>
+                        <input type="number" name="tinggi" id="edit_tinggi" placeholder="T" required class="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none">
+                    </div>
                 </div>
                 
                 <x-form-input type="textarea" name="deskripsi" id="edit_deskripsi" label="Deskripsi / Catatan" rows="2" />
@@ -277,7 +295,7 @@
 
         <div class="flex justify-end gap-3 pt-6 border-t border-secondary-100">
             <button type="button" onclick="closeModal('modal-edit-order')" class="px-5 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">Batal</button>
-            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-warning-600 rounded-xl hover:bg-warning-700 transition-colors shadow-sm">Simpan Perubahan</button>
+            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-sm">Simpan Perubahan</button>
         </div>
     </form>
 </x-modal>
@@ -377,7 +395,12 @@
         
         document.getElementById('edit_isi_produk').value = order.isi_produk;
         document.getElementById('edit_berat').value = order.berat;
-        document.getElementById('edit_dimensi').value = order.dimensi;
+        if (order.dimensi) {
+            const dimensiParts = order.dimensi.split('x');
+            document.getElementById('edit_panjang').value = dimensiParts[0] || '';
+            document.getElementById('edit_lebar').value = dimensiParts[1] || '';
+            document.getElementById('edit_tinggi').value = dimensiParts[2] || '';
+        }
         document.getElementById('edit_deskripsi').value = order.deskripsi || '';
         
         if (order.kemasan == 'iya' || order.kemasan == '1') {
@@ -408,11 +431,48 @@
         openModal('modal-edit-order');
     }
 
-    function handleDelete(kodeOrder) {
-        confirmDelete('Pesanan ' + kodeOrder, function() {
+    function handleCancel(kodeOrder, isiProduk) {
+        // Build a custom modal for cancel confirmation
+        const modalHtml = `
+            <div id="cancel-confirm-modal" data-modal-backdrop class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-scale-in">
+                    <div class="p-6 text-center">
+                        <div class="mx-auto w-14 h-14 rounded-full bg-warning-50 flex items-center justify-center mb-4">
+                            <svg class="w-7 h-7 text-warning-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-secondary-900 mb-2">Batalkan Order</h3>
+                        <p class="text-secondary-500 text-sm">Apakah Anda yakin ingin membatalkan pesanan <strong class="text-secondary-700">${isiProduk}</strong>? Pesanan yang dibatalkan tidak akan diproses lebih lanjut.</p>
+                    </div>
+                    <div class="flex gap-3 px-6 pb-6">
+                        <button onclick="document.getElementById('cancel-confirm-modal').remove(); document.body.style.overflow='';" class="flex-1 px-4 py-2.5 text-sm font-medium text-secondary-700 bg-secondary-100 rounded-xl hover:bg-secondary-200 transition-colors">
+                            Kembali
+                        </button>
+                        <button id="confirm-cancel-btn" class="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-warning-500 rounded-xl hover:bg-warning-600 transition-colors">
+                            Ya, Batalkan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.body.style.overflow = 'hidden';
+
+        document.getElementById('confirm-cancel-btn').addEventListener('click', function () {
+            document.getElementById('cancel-confirm-modal').remove();
+            document.body.style.overflow = '';
             const form = document.getElementById('delete-form');
             form.action = '/orders/' + kodeOrder + '?role=supplier';
             form.submit();
+        });
+
+        document.getElementById('cancel-confirm-modal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.remove();
+                document.body.style.overflow = '';
+            }
         });
     }
 
