@@ -25,7 +25,7 @@
         </div>
         <div class="flex gap-2">
             @if(request('role', 'staff') !== 'staff')
-            <a href="/tracking/1?role={{ request('role', 'staff') }}" class="px-4 py-2 bg-white border border-secondary-200 text-secondary-700 rounded-xl hover:bg-secondary-50 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
+            <a href="/tracking/{{ $order->kode_order }}?role={{ request('role', 'staff') }}" class="px-4 py-2 bg-white border border-secondary-200 text-secondary-700 rounded-xl hover:bg-secondary-50 transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
                 <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Live Tracking
             </a>
